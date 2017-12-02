@@ -1,0 +1,109 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:cefSharp="clr-namespace:CefSharp.WinForms;assembly=CefSharp.WinForms"
+        xmlns:local="clr-namespace:BotzoneLocalRunner"
+        xmlns:Forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" x:Class="BotzoneLocalRunner.MainWindow"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="474" Width="850.816" Closing="Window_Closing" Loaded="Window_Loaded">
+	<Window.DataContext>
+		<local:MainWindowViewModel x:Name="ViewModel" />
+	</Window.DataContext>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="251*"/>
+			<RowDefinition Height="123*"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="61*"/>
+			<ColumnDefinition Width="164*"/>
+			<ColumnDefinition Width="418*"/>
+		</Grid.ColumnDefinitions>
+		<Button x:Name="btnStartMatch" Content="开始对局" Margin="10,0,10,9.5" VerticalAlignment="Bottom" Height="28" Click="btnLocalAI_Click" Grid.ColumnSpan="2" ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True" DataContext="{Binding CurrentConfiguration}" IsEnabled="{Binding IsValid}">
+			<Button.ToolTip>
+				<TextBlock Text="{Binding ValidationString}" Foreground="Red" FontWeight="Bold">
+					<TextBlock.Style>
+						<Style TargetType="{x:Type TextBlock}">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsValid}" Value="true">
+									<Setter Property="TextBlock.Visibility" Value="Collapsed"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</TextBlock.Style>
+				</TextBlock>
+			</Button.ToolTip>
+		</Button>
+		<WindowsFormsHost Margin="0,0,0,0.5" Grid.Column="2">
+			<cefSharp:ChromiumWebBrowser x:Name="WebBrowser" Enabled="True" Dock="Fill"/>
+		</WindowsFormsHost>
+		<GroupBox Header="玩家配备" Margin="10,36,10,42.5" Grid.ColumnSpan="2">
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<ItemsControl ItemsSource="{Binding CurrentConfiguration}" ScrollViewer.CanContentScroll="True">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Grid Margin="0,0,0,10">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="124*"/>
+									<ColumnDefinition Width="49*"/>
+								</Grid.ColumnDefinitions>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*"/>
+									<RowDefinition/>
+								</Grid.RowDefinitions>
+								<ComboBox x:Name="cmbType"
+										  ItemsSource="{Binding Type, Converter={local:EnumToCollectionConverter}, Mode=OneTime}"
+										  DisplayMemberPath="Description"
+										  SelectedItem="{Binding Type, Converter={local:ValueDescriptionToEnumConverter}}"
+										  IsSynchronizedWithCurrentItem="True"
+										  Grid.ColumnSpan="2"/>
+								<Button x:Name="btnSelect" Content="选择..." Tag="{Binding}" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" Click="btnSelect_Click"/>
+								<TextBox x:Name="txtContent" IsReadOnly="false" Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding ID, ValidatesOnDataErrors=True}" MouseEnter="txtContent_MouseEnter" />
+							</Grid>
+							<DataTemplate.Triggers>
+								<DataTrigger Binding="{Binding Type}" Value="LocalAI">
+									<Setter Property="Visibility" Value="Visible" TargetName="btnSelect"/>
+									<Setter Property="Grid.ColumnSpan" Value="1" TargetName="txtContent"/>
+								</DataTrigger>
+								<DataTrigger Binding="{Binding Type}" Value="LocalHuman">
+									<Setter Property="IsReadOnly" Value="true" TargetName="txtContent"/>
+								</DataTrigger>
+							</DataTemplate.Triggers>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+		</GroupBox>
+		<TabControl Grid.ColumnSpan="3" Margin="0,0.5" Grid.Row="1">
+			<TabItem Header="日志">
+				<Grid Background="#FFE5E5E5">
+					<ListBox x:Name="lstLog" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Logs}">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock>
+									<Run Foreground="#FFC78107" Text="{Binding Date}" />
+									<Run Text="{Binding Message}" />
+								</TextBlock>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</Grid>
+			</TabItem>
+			<TabItem Header="过往对局">
+				<Grid Background="#FFE5E5E5">
+					<ListView x:Name="RecentMatchesView">
+						<ListView.View>
+							<GridView>
+								<GridViewColumn/>
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</Grid>
+			</TabItem>
+		</TabControl>
+		<ComboBox Margin="10,10,10,0" VerticalAlignment="Top" Grid.Column="1" IsEnabled="{Binding GamesLoaded}" SelectedIndex="0" ItemsSource="{Binding AllGames}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentConfiguration.Game}" IsSynchronizedWithCurrentItem="True"/>
+		<Label Content="游戏" Margin="0,10,0,0" VerticalAlignment="Top" Height="21" Padding="5,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
+	</Grid>
+</Window>
