@@ -7,44 +7,64 @@
         xmlns:local="clr-namespace:BotzoneLocalRunner"
         xmlns:Forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" x:Class="BotzoneLocalRunner.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="474" Width="850.816" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="MainWindow" Height="518" Width="850.816" Closing="Window_Closing" Loaded="Window_Loaded">
 	<Window.DataContext>
 		<local:MainWindowViewModel x:Name="ViewModel" />
 	</Window.DataContext>
-	<Grid>
+	<Grid Margin="0" Background="{DynamicResource Background}">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="251*"/>
-			<RowDefinition Height="123*"/>
+			<RowDefinition Height="30px"/>
+			<RowDefinition Height="313*"/>
+			<RowDefinition Height="176*"/>
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="61*"/>
 			<ColumnDefinition Width="164*"/>
 			<ColumnDefinition Width="418*"/>
 		</Grid.ColumnDefinitions>
-		<Button x:Name="btnStartMatch" Content="开始对局" Margin="10,0,10,9.5" VerticalAlignment="Bottom" Height="28" Click="btnLocalAI_Click" Grid.ColumnSpan="2" ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True" DataContext="{Binding CurrentConfiguration}" IsEnabled="{Binding IsValid}">
+		<ToolBarTray Margin="0" Grid.ColumnSpan="3" Grid.RowSpan="2">
+			<ToolBar Margin="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Background="#00EEF5FD">
+				<Button x:Name="btnLoad" VerticalAlignment="Center" Margin="0,0,5,0" Style="{DynamicResource ToolbarButton}">
+					<StackPanel Orientation="Horizontal">
+						<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.Open}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
+						<TextBlock TextWrapping="Wrap" Text="载入对局组"/>
+					</StackPanel>
+				</Button>
+				<Button x:Name="btnSave" VerticalAlignment="Center" Style="{DynamicResource ToolbarButton}">
+					<StackPanel Orientation="Horizontal">
+						<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.Save}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
+						<TextBlock  Text="保存对局组"/>
+					</StackPanel>
+				</Button>
+			</ToolBar>
+			<ToolBar VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Background="#00EEF5FD">
+				<TextBox x:Name="txtLocalAIURL" Margin="0,0,5,0" TextWrapping="Wrap" Text="&lt;在此粘贴Botzone本地AI的URL&gt;" VerticalAlignment="Top" HorizontalAlignment="Stretch" Width="357" MouseEnter="txtLocalAIURL_MouseEnter"/>
+				<Button x:Name="btnApplyURL" VerticalAlignment="Top" Style="{DynamicResource ToolbarButton}">
+					<StackPanel Orientation="Horizontal">
+						<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.OK}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
+						<TextBlock Text="应用"/>
+					</StackPanel>
+				</Button>
+			</ToolBar>
+		</ToolBarTray>
+		<Button x:Name="btnStartMatch" Margin="10,0,10,9.8" VerticalAlignment="Bottom" Height="28" Click="btnLocalAI_Click" Grid.ColumnSpan="2" ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True" ToolTipService.IsEnabled="{Binding IsValid, Converter={local:InverseBooleanConverter}}" DataContext="{Binding CurrentConfiguration}" IsEnabled="{Binding IsValid}" Grid.Row="1">
+			<StackPanel Orientation="Horizontal">
+				<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.Run}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
+				<TextBlock Text="开始对局"/>
+			</StackPanel>
 			<Button.ToolTip>
-				<TextBlock Text="{Binding ValidationString}" Foreground="Red" FontWeight="Bold">
-					<TextBlock.Style>
-						<Style TargetType="{x:Type TextBlock}">
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding IsValid}" Value="true">
-									<Setter Property="TextBlock.Visibility" Value="Collapsed"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</TextBlock.Style>
-				</TextBlock>
+				<TextBlock Text="{Binding ValidationString}" Foreground="Red" FontWeight="Bold"/>
 			</Button.ToolTip>
 		</Button>
-		<WindowsFormsHost Margin="0,0,0,0.5" Grid.Column="2">
+		<WindowsFormsHost Margin="0,13,-0.2,0.8" Grid.Column="2" Grid.Row="1">
 			<cefSharp:ChromiumWebBrowser x:Name="WebBrowser" Enabled="True" Dock="Fill"/>
 		</WindowsFormsHost>
-		<GroupBox Header="玩家配备" Margin="10,36,10,42.5" Grid.ColumnSpan="2">
+		<GroupBox Header="玩家配备" Margin="10,38.6,10,43" Grid.ColumnSpan="2" Grid.Row="1">
 			<ScrollViewer VerticalScrollBarVisibility="Auto">
 				<ItemsControl ItemsSource="{Binding CurrentConfiguration}" ScrollViewer.CanContentScroll="True">
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
-							<Grid Margin="0,0,0,10">
+							<Grid Margin="0,10,0,0">
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="124*"/>
 									<ColumnDefinition Width="49*"/>
@@ -54,11 +74,11 @@
 									<RowDefinition/>
 								</Grid.RowDefinitions>
 								<ComboBox x:Name="cmbType"
-										  ItemsSource="{Binding Type, Converter={local:EnumToCollectionConverter}, Mode=OneTime}"
-										  DisplayMemberPath="Description"
-										  SelectedItem="{Binding Type, Converter={local:ValueDescriptionToEnumConverter}}"
-										  IsSynchronizedWithCurrentItem="True"
-										  Grid.ColumnSpan="2"/>
+										ItemsSource="{Binding Type, Converter={local:EnumToCollectionConverter}, Mode=OneTime}"
+										DisplayMemberPath="Description"
+										SelectedItem="{Binding Type, Converter={local:ValueDescriptionToEnumConverter}}"
+										IsSynchronizedWithCurrentItem="True"
+										Grid.ColumnSpan="2"/>
 								<Button x:Name="btnSelect" Content="选择..." Tag="{Binding}" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" Click="btnSelect_Click"/>
 								<TextBox x:Name="txtContent" IsReadOnly="false" Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding ID, ValidatesOnDataErrors=True}" MouseEnter="txtContent_MouseEnter" />
 							</Grid>
@@ -76,16 +96,13 @@
 				</ItemsControl>
 			</ScrollViewer>
 		</GroupBox>
-		<TabControl Grid.ColumnSpan="3" Margin="0,0.5" Grid.Row="1">
+		<TabControl Grid.ColumnSpan="3" Margin="0,0.2,-0.2,0.8" Grid.Row="2" Background="Transparent">
 			<TabItem Header="日志">
 				<Grid Background="#FFE5E5E5">
 					<ListBox x:Name="lstLog" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Logs}">
 						<ListBox.ItemTemplate>
 							<DataTemplate>
-								<TextBlock>
-									<Run Foreground="#FFC78107" Text="{Binding Date}" />
-									<Run Text="{Binding Message}" />
-								</TextBlock>
+								<TextBlock><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
 							</DataTemplate>
 						</ListBox.ItemTemplate>
 					</ListBox>
@@ -103,7 +120,7 @@
 				</Grid>
 			</TabItem>
 		</TabControl>
-		<ComboBox Margin="10,10,10,0" VerticalAlignment="Top" Grid.Column="1" IsEnabled="{Binding GamesLoaded}" SelectedIndex="0" ItemsSource="{Binding AllGames}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentConfiguration.Game}" IsSynchronizedWithCurrentItem="True"/>
-		<Label Content="游戏" Margin="0,10,0,0" VerticalAlignment="Top" Height="21" Padding="5,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
+		<ComboBox Margin="10,13,10,0" VerticalAlignment="Top" Grid.Column="1" IsEnabled="{Binding GamesLoaded}" SelectedIndex="0" ItemsSource="{Binding AllGames}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentConfiguration.Game}" IsSynchronizedWithCurrentItem="True" Height="21" Grid.Row="1"/>
+		<Label Content="游戏" Margin="0,13,0,0" VerticalAlignment="Top" Height="21" Padding="5,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Grid.Row="1"/>
 	</Grid>
 </Window>

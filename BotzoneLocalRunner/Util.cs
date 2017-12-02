@@ -3,15 +3,34 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace BotzoneLocalRunner
 {
+	#region MVVM数据绑定辅助
+	[ValueConversion(typeof(bool), typeof(bool))]
+	public class InverseBooleanConverter : MarkupExtension, IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter,
+			System.Globalization.CultureInfo culture)
+			=> !(bool)value;
+
+		public object ConvertBack(object value, Type targetType, object parameter,
+			System.Globalization.CultureInfo culture)
+			=> null;
+		public override object ProvideValue(IServiceProvider serviceProvider)
+			=> this;
+	}
+
 	public class RangeObservableCollection<T> : ObservableCollection<T>
 	{
 		public RangeObservableCollection() : base() { }
@@ -46,44 +65,33 @@ namespace BotzoneLocalRunner
 	{
 		public Enum Value { get; set; }
 		public string Description { get; set; }
-		public static implicit operator Enum(ValueDescription me)
-		{
-			return me.Value;
-		}
+		public static implicit operator Enum(ValueDescription me) => me.Value;
 	}
 
 	[ValueConversion(typeof(ValueDescription), typeof(Enum))]
 	public class ValueDescriptionToEnumConverter : MarkupExtension, IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			return new ValueDescription { Value = (Enum)value, Description = (value as Enum).Description() };
-		}
+			=> new ValueDescription { Value = (Enum)value, Description = (value as Enum).Description() };
+
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			return (value as ValueDescription)?.Value;
-		}
+			=> (value as ValueDescription)?.Value;
+
 		public override object ProvideValue(IServiceProvider serviceProvider)
-		{
-			return this;
-		}
+			=> this;
 	}
 
 	[ValueConversion(typeof(Enum), typeof(IEnumerable<ValueDescription>))]
 	public class EnumToCollectionConverter : MarkupExtension, IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			return EnumHelper.GetAllValuesAndDescriptions(value.GetType());
-		}
+			=> EnumHelper.GetAllValuesAndDescriptions(value.GetType());
+
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			return null;
-		}
+			=> null;
+
 		public override object ProvideValue(IServiceProvider serviceProvider)
-		{
-			return this;
-		}
+			=> this;
 	}
 
 	public static class EnumHelper
@@ -98,14 +106,42 @@ namespace BotzoneLocalRunner
 		}
 
 		public static IEnumerable<ValueDescription> GetAllValuesAndDescriptions(Type t)
-		{
-			if (!t.IsEnum)
-				throw new ArgumentException("t must be an enum type");
-
-			return from Enum e in Enum.GetValues(t)
-				   select new ValueDescription { Value = e, Description = e.Description() };
-		}
+			=> from Enum e in Enum.GetValues(t)
+			   select new ValueDescription { Value = e, Description = e.Description() };
 	}
+
+	public static class BitmapHelper
+	{
+		[System.Runtime.InteropServices.DllImport("gdi32.dll")]
+		public static extern bool DeleteObject(IntPtr hObject);
+	}
+
+	[ValueConversion(typeof(Bitmap), typeof(BitmapSource))]
+	public class BitmapRGBAToWPFConverter : MarkupExtension, IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			var hBitmap = (value as Bitmap).GetHbitmap();
+			
+			try
+			{
+				return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+					hBitmap, IntPtr.Zero, Int32Rect.Empty,
+					BitmapSizeOptions.FromEmptyOptions());
+			}
+			finally
+			{
+				BitmapHelper.DeleteObject(hBitmap);
+			}
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			=> null;
+
+		public override object ProvideValue(IServiceProvider serviceProvider)
+			=> this;
+	}
+#endregion
 
 	internal static class Util
     {

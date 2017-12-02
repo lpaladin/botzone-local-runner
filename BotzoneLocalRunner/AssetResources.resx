@@ -117,31 +117,38 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BAD_LOCALAI_URL" xml:space="preserve">
-    <value>复制的URL无效</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Deny" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusblocked_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="BOTZONEBOT_PLACEHOLDER" xml:space="preserve">
-    <value>&lt;请在这里输入Bot的ID&gt;</value>
+  <data name="Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statuscriticalerror_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="BOTZONE_API_BASE" xml:space="preserve">
-    <value>https://www.botzone.org/api/</value>
+  <data name="Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusinformation_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ID_EMPTY" xml:space="preserve">
-    <value>玩家ID不可为空</value>
+  <data name="InvertInfo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusinfotip_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="LOCALAI_PLACEHOLDER" xml:space="preserve">
-    <value>&lt;请使用选择按钮选择程序&gt;</value>
+  <data name="No" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusno_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="LOCALHUMAN_PLACEHOLDER" xml:space="preserve">
-    <value>&lt;开启对局后在右侧展示画面操作&gt;</value>
+  <data name="OK" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusok_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="OFD_FILTER" xml:space="preserve">
-    <value>所有程序 (*.exe;*.py;*.js;Main.class)|*.exe;*.py;*.js;*.class|Python 代码 (*.py)|*.py|Node.js 代码 (*.js)|*.js|Java 主类文件 |Main.class</value>
+  <data name="Open" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\OpenQueryView_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="OFD_TITLE" xml:space="preserve">
-    <value>选择要运行的本地AI程序</value>
+  <data name="Required" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusrequired_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="WRONG_BOTZONE_AI_COUNT" xml:space="preserve">
-    <value>Botzone上的AI只可以有0个或{0}个</value>
+  <data name="Run" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statusrun_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SaveTable_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Warning" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\statuswarning_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

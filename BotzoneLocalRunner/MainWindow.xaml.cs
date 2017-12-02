@@ -134,5 +134,12 @@ namespace BotzoneLocalRunner
 			s.Focus();
 			s.SelectAll();
 		}
+
+		private void txtLocalAIURL_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+		{
+			var s = (sender as TextBox);
+			s.Focus();
+			s.SelectAll();
+		}
 	}
 }

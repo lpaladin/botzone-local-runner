@@ -3,7 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BotzoneLocalRunner"
              StartupUri="MainWindow.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
+	<Application.Resources>
+		<SolidColorBrush x:Key="Background" Color="White"></SolidColorBrush>
+		<Style x:Key="ToolbarButton" TargetType="Button">
+			<Setter Property="BorderBrush" Value="#FFD0D0D0" />
+			<Setter Property="Background" Value="#FFEEEEEE" />
+			<Setter Property="Margin" Value="0,0,5,0" />
+			<Setter Property="Padding" Value="3" />
+		</Style>
+	</Application.Resources>
 </Application>

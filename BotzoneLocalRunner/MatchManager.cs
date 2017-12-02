@@ -70,7 +70,6 @@ namespace BotzoneLocalRunner
 			get
 			{
 				return ID.Length != 0 &&
-					ID != StringResources.LOCALHUMAN_PLACEHOLDER &&
 					ID != StringResources.LOCALAI_PLACEHOLDER &&
 					ID != StringResources.BOTZONEBOT_PLACEHOLDER;
 			}
