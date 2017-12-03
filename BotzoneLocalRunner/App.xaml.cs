@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,6 +18,10 @@ namespace BotzoneLocalRunner
 		private App()
 		{
 			Cef.EnableHighDPISupport();
+			Cef.Initialize(new CefSettings
+			{
+				Locale = CultureInfo.CurrentCulture.Name
+			});
 		}
 	}
 }

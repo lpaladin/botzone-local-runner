@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 
 namespace BotzoneLocalRunner
 {
-	internal enum LogLevel
+	public enum LogLevel
 	{
 		Info,
 		InfoTip,
@@ -25,12 +25,12 @@ namespace BotzoneLocalRunner
 		Error
 	}
 
-	internal interface ILogger
+	public interface ILogger
 	{
 		void Log(LogLevel level, string message);
 	}
 
-	internal class ConsoleLogger : ILogger
+	public class ConsoleLogger : ILogger
 	{
 		public void Log(LogLevel level, string message)
 		{
@@ -91,9 +91,9 @@ namespace BotzoneLocalRunner
             => this;
     }
 
-    internal class ViewModelLogger : ILogger
+    public class ViewModelLogger : ILogger
 	{
-		internal class LogItem
+		public class LogItem
 		{
 			public LogLevel Level { get; set; }
 			public string Date { get; set; }

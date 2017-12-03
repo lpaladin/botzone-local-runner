@@ -19,7 +19,7 @@ namespace BotzoneLocalRunner {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class StringResources {
@@ -61,20 +61,11 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 复制的URL无效 的本地化字符串。
+        ///   查找类似 Botzone本地AI的URL无效 的本地化字符串。
         /// </summary>
         public static string BAD_LOCALAI_URL {
             get {
                 return ResourceManager.GetString("BAD_LOCALAI_URL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 https://www.botzone.org/api/ 的本地化字符串。
-        /// </summary>
-        public static string BOTZONE_API_BASE {
-            get {
-                return ResourceManager.GetString("BOTZONE_API_BASE", resourceCulture);
             }
         }
         
@@ -93,6 +84,33 @@ namespace BotzoneLocalRunner {
         public static string BOTZONE_LOCALAI_URL_REGEX {
             get {
                 return ResourceManager.GetString("BOTZONE_LOCALAI_URL_REGEX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 这是一场 Botzone 评测的对局 的本地化字符串。
+        /// </summary>
+        public static string BOTZONE_MATCH {
+            get {
+                return ResourceManager.GetString("BOTZONE_MATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 人类玩家只能和本地AI对战（否则请直接在Botzone网站上进行人机对局） 的本地化字符串。
+        /// </summary>
+        public static string BOTZONE_MATCH_NO_HUMAN {
+            get {
+                return ResourceManager.GetString("BOTZONE_MATCH_NO_HUMAN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 与 Botzone 上的AI对战时只能有一个本地AI 的本地化字符串。
+        /// </summary>
+        public static string BOTZONE_MATCH_ONE_LOCALAI {
+            get {
+                return ResourceManager.GetString("BOTZONE_MATCH_ONE_LOCALAI", resourceCulture);
             }
         }
         
@@ -120,6 +138,15 @@ namespace BotzoneLocalRunner {
         public static string ID_EMPTY {
             get {
                 return ResourceManager.GetString("ID_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 这是一场本地运行的对局 的本地化字符串。
+        /// </summary>
+        public static string LOCAL_MATCH {
+            get {
+                return ResourceManager.GetString("LOCAL_MATCH", resourceCulture);
             }
         }
         
@@ -165,15 +192,6 @@ namespace BotzoneLocalRunner {
         public static string TOO_MANY_HUMAN {
             get {
                 return ResourceManager.GetString("TOO_MANY_HUMAN", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Botzone上的AI只可以有0个或{0}个 的本地化字符串。
-        /// </summary>
-        public static string WRONG_BOTZONE_AI_COUNT {
-            get {
-                return ResourceManager.GetString("WRONG_BOTZONE_AI_COUNT", resourceCulture);
             }
         }
     }

@@ -24,7 +24,7 @@ namespace BotzoneLocalRunner
         public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
     }
 
-    internal class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
 	{
         private BotzoneCredentials _Credentials;
         public BotzoneCredentials Credentials
@@ -210,10 +210,13 @@ namespace BotzoneLocalRunner
 		{
 			InitializeComponent();
 
-            ViewModel.Credentials = new BotzoneCredentials();
-			ViewModel.AllGames = new RangeObservableCollection<Game>(new [] { new Game { Name = "..." } });
 			ViewModel.CurrentConfiguration = new MatchConfiguration();
+            BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
+			ViewModel.AllGames = new RangeObservableCollection<Game>(new [] { new Game { Name = "..." } });
 			ViewModel.Logs = new ObservableCollection<ViewModelLogger.LogItem>();
+
+			if (Properties.Settings.Default.LastBotzoneLocalAIURL?.Length > 0)
+				BotzoneProtocol.Credentials.BotzoneCopiedURL = Properties.Settings.Default.LastBotzoneLocalAIURL;
 
 			Util.Logger = new ViewModelLogger(ViewModel.Logs);
 			WebBrowser.BrowserSettings = new BrowserSettings
@@ -228,15 +231,6 @@ namespace BotzoneLocalRunner
 					})
 			};
 			WebBrowser.Load("https://www.botzone.org");
-		}
-
-		private async void btnLocalAI_Click(object sender, RoutedEventArgs e)
-		{
-			if (ofd.ShowDialog() == true)
-				MessageBox.Show(await LocalProgramRunner
-					.RunProgram(ofd.FileName)
-					.StandardOutput
-					.ReadToEndAsync());
 		}
 
 		private void Window_Closing(object sender, CancelEventArgs e)
@@ -278,6 +272,18 @@ namespace BotzoneLocalRunner
 
 			s.Focus();
 			s.SelectAll();
+		}
+
+		private async void btnStartMatch_Click(object sender, RoutedEventArgs e)
+		{
+			var conf = ViewModel.CurrentConfiguration;
+			var matchID = await BotzoneProtocol.RequestMatch(conf);
+			var match = new BotzoneMatch(conf, matchID);
+			while (match.Status != MatchStatus.Finished || match.Status != MatchStatus.Aborted)
+			{
+				await match.FetchNextMatchRequest();
+				await match.Runner.RunForResponse();
+			}
 		}
 	}
 }
