@@ -126,6 +126,15 @@
   <data name="BOTZONE_API_BASE" xml:space="preserve">
     <value>https://www.botzone.org/api/</value>
   </data>
+  <data name="BOTZONE_LOCALAI_URL_PROMPT" xml:space="preserve">
+    <value>&lt;在此粘贴Botzone本地AI的URL（点击头像菜单查看）&gt;</value>
+  </data>
+  <data name="BOTZONE_LOCALAI_URL_REGEX" xml:space="preserve">
+    <value>www.botzone.org/api/([0-9a-f]+)/([^/]+)/localai</value>
+  </data>
+  <data name="CHOOSE_GAME_FIRST" xml:space="preserve">
+    <value>请选择游戏</value>
+  </data>
   <data name="ID_EMPTY" xml:space="preserve">
     <value>玩家ID不可为空</value>
   </data>
@@ -140,6 +149,9 @@
   </data>
   <data name="OFD_TITLE" xml:space="preserve">
     <value>选择要运行的本地AI程序</value>
+  </data>
+  <data name="TOO_MANY_HUMAN" xml:space="preserve">
+    <value>人类玩家最多只能有一个</value>
   </data>
   <data name="WRONG_BOTZONE_AI_COUNT" xml:space="preserve">
     <value>Botzone上的AI只可以有0个或{0}个</value>

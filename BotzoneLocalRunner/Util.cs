@@ -16,13 +16,20 @@ using System.Windows.Media.Imaging;
 
 namespace BotzoneLocalRunner
 {
+    internal interface IValidationBubbling
+    {
+        bool IsValid { get; set; }
+        string ValidationString { get; set; }
+        event EventHandler ValidationChanged;
+    }
+
 	#region MVVM数据绑定辅助
-	[ValueConversion(typeof(bool), typeof(bool))]
-	public class InverseBooleanConverter : MarkupExtension, IValueConverter
+	[ValueConversion(typeof(bool), typeof(Visibility))]
+	public class InverseBooleanToVisibilityConverter : MarkupExtension, IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter,
 			System.Globalization.CultureInfo culture)
-			=> !(bool)value;
+			=> (bool)value ? Visibility.Collapsed : Visibility.Visible;
 
 		public object ConvertBack(object value, Type targetType, object parameter,
 			System.Globalization.CultureInfo culture)

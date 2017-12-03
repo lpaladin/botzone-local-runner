@@ -60,29 +60,56 @@ namespace BotzoneLocalRunner
 				if (value != _ID)
 				{
 					_ID = value;
+					if (ID.Length != 0 &&
+						ID != StringResources.LOCALAI_PLACEHOLDER &&
+						ID != StringResources.BOTZONEBOT_PLACEHOLDER)
+						IsValid = true;
+					else
+					{
+						IsValid = false;
+						ValidationString = StringResources.ID_EMPTY;
+					}
 					NotifyPropertyChanged("ID");
 				}
 			}
 		}
 
+		private bool _IsValid = false;
 		public bool IsValid
 		{
-			get
+			get => _IsValid;
+			set
 			{
-				return ID.Length != 0 &&
-					ID != StringResources.LOCALAI_PLACEHOLDER &&
-					ID != StringResources.BOTZONEBOT_PLACEHOLDER;
+				if (value != _IsValid)
+				{
+					_IsValid = value;
+					NotifyPropertyChanged("IsValid");
+				}
 			}
 		}
 
-		public string Error => throw new NotImplementedException();
+		private string _ValidationString = StringResources.ID_EMPTY;
+		public string ValidationString
+		{
+			get => _ValidationString;
+			set
+			{
+				if (value != _ValidationString)
+				{
+					_ValidationString = value;
+					NotifyPropertyChanged("ValidationString");
+				}
+			}
+		}
+
+		public string Error => "";
 
 		public string this[string columnName]
 		{
 			get
 			{
 				if (columnName == "ID" && !IsValid)
-					return StringResources.ID_EMPTY;
+					return ValidationString;
 				return null;
 			}
 		}
@@ -93,8 +120,8 @@ namespace BotzoneLocalRunner
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
-	internal class MatchConfiguration : ObservableCollection<PlayerConfiguration>
-	{
+	internal class MatchConfiguration : ObservableCollection<PlayerConfiguration>, IValidationBubbling
+    {
 		private Game _Game;
 		public Game Game
 		{
@@ -128,7 +155,7 @@ namespace BotzoneLocalRunner
 		}
 
 
-		private string _ValidationString;
+		private string _ValidationString = StringResources.CHOOSE_GAME_FIRST;
 		public string ValidationString
 		{
 			get => _ValidationString;
@@ -142,7 +169,9 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        public event EventHandler ValidationChanged;
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
 		{
 			base.OnCollectionChanged(e);
 			PlayerConfigurationPropertyChanged(null, null);
@@ -157,25 +186,41 @@ namespace BotzoneLocalRunner
 		public void PlayerConfigurationPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			int botzoneAICount = 0;
+			bool hasMe = false;
 			foreach (var config in this)
 			{
 				if (!config.IsValid)
 				{
 					IsValid = false;
 					ValidationString = StringResources.ID_EMPTY;
-					return;
+                    ValidationChanged(this, null);
+                    return;
 				}
 				if (config.Type == PlayerType.BotzoneBot)
 					botzoneAICount++;
+				else if (config.Type == PlayerType.LocalHuman)
+				{
+					if (!hasMe)
+						hasMe = true;
+					else
+					{
+						IsValid = false;
+						ValidationString = StringResources.TOO_MANY_HUMAN;
+                        ValidationChanged(this, null);
+                        return;
+					}
+				}
 			}
 			if (botzoneAICount != 0 && botzoneAICount != Count - 1)
 			{
 				IsValid = false;
 				ValidationString = String.Format(StringResources.WRONG_BOTZONE_AI_COUNT, Count - 1);
-				return;
+                ValidationChanged(this, null);
+                return;
 			}
 			IsValid = true;
-		}
+            ValidationChanged(this, null);
+        }
 	}
 
 	internal class Match

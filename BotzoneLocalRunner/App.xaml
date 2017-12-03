@@ -6,10 +6,27 @@
 	<Application.Resources>
 		<SolidColorBrush x:Key="Background" Color="White"></SolidColorBrush>
 		<Style x:Key="ToolbarButton" TargetType="Button">
-			<Setter Property="BorderBrush" Value="#FFD0D0D0" />
-			<Setter Property="Background" Value="#FFEEEEEE" />
 			<Setter Property="Margin" Value="0,0,5,0" />
 			<Setter Property="Padding" Value="3" />
+		</Style>
+		<Style x:Key="ValidationTextBox" TargetType="TextBox">
+			<Style.Triggers>
+				<Trigger Property="Validation.HasError" Value="True">
+					<Setter Property="ToolTip">
+						<Setter.Value>
+							<ToolTip>
+								<BulletDecorator>
+									<BulletDecorator.Bullet>
+										<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.Required}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
+									</BulletDecorator.Bullet>
+									<TextBlock Text="{Binding ValidationString}" Foreground="Red" FontWeight="Bold" Margin="5,0,0,0"/>
+								</BulletDecorator>
+							</ToolTip>
+						</Setter.Value>
+					</Setter>
+				</Trigger>
+			</Style.Triggers>
+			<Setter Property="ToolTipService.InitialShowDelay" Value="0"></Setter>
 		</Style>
 	</Application.Resources>
 </Application>

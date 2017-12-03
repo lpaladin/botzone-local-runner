@@ -15,54 +15,94 @@ using static BotzoneLocalRunner.Util;
 
 namespace BotzoneLocalRunner
 {
-	internal static class BotzoneProtocol
+	internal class BotzoneCredentials : INotifyPropertyChanged, IDataErrorInfo, IValidationBubbling
 	{
-		internal class BotzoneCredentials : INotifyPropertyChanged, IDataErrorInfo
+		internal string UserID { get; set; }
+		internal string Secret { get; set; }
+
+		private string _BotzoneCopiedURL = "<在此粘贴Botzone本地AI的URL>";
+		public string BotzoneCopiedURL
 		{
-			internal string UserID { get; set; }
-			internal string Secret { get; set; }
-
-			private string _BotzoneCopiedURL = "<在此粘贴Botzone本地AI的URL>";
-			public string BotzoneCopiedURL
+			get => _BotzoneCopiedURL;
+			set
 			{
-				get => _BotzoneCopiedURL;
-				set
+				if (value != _BotzoneCopiedURL)
 				{
-					if (value != _BotzoneCopiedURL)
+					_BotzoneCopiedURL = value;
+					var m = Regex.Matches(BotzoneCopiedURL, StringResources.BOTZONE_LOCALAI_URL_REGEX);
+					if (m.Count != 1)
 					{
-						_BotzoneCopiedURL = value;
-						NotifyPropertyChanged("BotzoneCopiedURL");
+						IsValid = false;
+						ValidationString = StringResources.BAD_LOCALAI_URL;
+						ValidationChanged(this, null);
 					}
+					else
+					{
+						UserID = m[0].Groups[1].Value;
+						Secret = m[0].Groups[2].Value;
+						IsValid = true;
+						ValidationChanged(this, null);
+					}
+
+					NotifyPropertyChanged("BotzoneCopiedURL");
 				}
 			}
-
-			internal string BotzoneLocalAIURL() => $"{UserID}/{Secret}/localai";
-			internal string BotzoneRunMatchURL() => $"{UserID}/{Secret}/runmatch";
-
-			public string Error => throw new NotImplementedException();
-
-			public string this[string columnName]
-			{
-				get
-				{
-					if (columnName == "BotzoneCopiedURL")
-					{
-						var m = Regex.Matches(BotzoneCopiedURL, @"/([0-9a-f]+)/([^/]+)/localai");
-						if (m.Count != 2)
-							return StringResources.BAD_LOCALAI_URL;
-						UserID = m[0].Value;
-						Secret = m[1].Value;
-					}
-					return null;
-				}
-			}
-
-			private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-			public event PropertyChangedEventHandler PropertyChanged;
 		}
 
+		internal string BotzoneLocalAIURL() => $"{UserID}/{Secret}/localai";
+		internal string BotzoneRunMatchURL() => $"{UserID}/{Secret}/runmatch";
+
+		private bool _IsValid = false;
+		public bool IsValid
+		{
+			get => _IsValid;
+			set
+			{
+				if (value != _IsValid)
+				{
+					_IsValid = value;
+					NotifyPropertyChanged("IsValid");
+				}
+			}
+		}
+
+
+		private string _ValidationString = StringResources.BAD_LOCALAI_URL;
+		public string ValidationString
+		{
+			get => _ValidationString;
+			set
+			{
+				if (value != _ValidationString)
+				{
+					_ValidationString = value;
+					NotifyPropertyChanged("ValidationString");
+				}
+			}
+		}
+
+		public string Error => "";
+
+		public string this[string columnName]
+		{
+			get
+			{
+				if (columnName == "BotzoneCopiedURL" && !IsValid)
+					return ValidationString;
+
+				return null;
+			}
+		}
+
+		private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		public event EventHandler ValidationChanged;
+	}
+
+	internal static class BotzoneProtocol
+	{
 		static BotzoneCredentials Credentials;
 
 		static readonly string BotzoneGameURL = "public/games";
@@ -77,7 +117,7 @@ namespace BotzoneLocalRunner
 			JArray raw = null;
 			do
 			{
-				Logger.Log("尝试从 Botzone 读取游戏列表……");
+				Logger.Log(LogLevel.Info, "尝试从 Botzone 读取游戏列表……");
 				try
 				{
 					var res = await client.GetAsync(BotzoneGameURL);
@@ -86,13 +126,13 @@ namespace BotzoneLocalRunner
 				}
 				catch (Exception ex)
 				{
-					Logger.Log("请求过程中发生错误：" + ex.Message);
-					Logger.Log("5秒后重试……");
+					Logger.Log(LogLevel.Warning, "请求过程中发生错误：" + ex.Message);
+					Logger.Log(LogLevel.Info, "5秒后重试……");
 					await Task.Delay(5000);
 				}
 			} while (raw == null);
 
-			Logger.Log("游戏列表加载成功！");
+			Logger.Log(LogLevel.OK, "游戏列表加载成功！");
 			return from game in raw.Children()
 				   select new Game
 				   {

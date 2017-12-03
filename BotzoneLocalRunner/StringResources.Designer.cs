@@ -22,7 +22,7 @@ namespace BotzoneLocalRunner {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class StringResources {
+    public class StringResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace BotzoneLocalRunner {
         ///   返回此类使用的缓存的 ResourceManager 实例。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BotzoneLocalRunner.StringResources", typeof(StringResources).Assembly);
@@ -51,7 +51,7 @@ namespace BotzoneLocalRunner {
         ///   重写当前线程的 CurrentUICulture 属性。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace BotzoneLocalRunner {
         /// <summary>
         ///   查找类似 复制的URL无效 的本地化字符串。
         /// </summary>
-        internal static string BAD_LOCALAI_URL {
+        public static string BAD_LOCALAI_URL {
             get {
                 return ResourceManager.GetString("BAD_LOCALAI_URL", resourceCulture);
             }
@@ -72,25 +72,52 @@ namespace BotzoneLocalRunner {
         /// <summary>
         ///   查找类似 https://www.botzone.org/api/ 的本地化字符串。
         /// </summary>
-        internal static string BOTZONE_API_BASE {
+        public static string BOTZONE_API_BASE {
             get {
                 return ResourceManager.GetString("BOTZONE_API_BASE", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   查找类似 &lt;在此粘贴Botzone本地AI的URL（点击头像菜单查看）&gt; 的本地化字符串。
+        /// </summary>
+        public static string BOTZONE_LOCALAI_URL_PROMPT {
+            get {
+                return ResourceManager.GetString("BOTZONE_LOCALAI_URL_PROMPT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 www.botzone.org/api/([0-9a-f]+)/([^/]+)/localai 的本地化字符串。
+        /// </summary>
+        public static string BOTZONE_LOCALAI_URL_REGEX {
+            get {
+                return ResourceManager.GetString("BOTZONE_LOCALAI_URL_REGEX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 &lt;请在这里输入Bot的ID&gt; 的本地化字符串。
         /// </summary>
-        internal static string BOTZONEBOT_PLACEHOLDER {
+        public static string BOTZONEBOT_PLACEHOLDER {
             get {
                 return ResourceManager.GetString("BOTZONEBOT_PLACEHOLDER", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   查找类似 请选择游戏 的本地化字符串。
+        /// </summary>
+        public static string CHOOSE_GAME_FIRST {
+            get {
+                return ResourceManager.GetString("CHOOSE_GAME_FIRST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 玩家ID不可为空 的本地化字符串。
         /// </summary>
-        internal static string ID_EMPTY {
+        public static string ID_EMPTY {
             get {
                 return ResourceManager.GetString("ID_EMPTY", resourceCulture);
             }
@@ -99,7 +126,7 @@ namespace BotzoneLocalRunner {
         /// <summary>
         ///   查找类似 &lt;请使用选择按钮选择程序&gt; 的本地化字符串。
         /// </summary>
-        internal static string LOCALAI_PLACEHOLDER {
+        public static string LOCALAI_PLACEHOLDER {
             get {
                 return ResourceManager.GetString("LOCALAI_PLACEHOLDER", resourceCulture);
             }
@@ -108,7 +135,7 @@ namespace BotzoneLocalRunner {
         /// <summary>
         ///   查找类似 &lt;开启对局后在右侧展示画面操作&gt; 的本地化字符串。
         /// </summary>
-        internal static string LOCALHUMAN_PLACEHOLDER {
+        public static string LOCALHUMAN_PLACEHOLDER {
             get {
                 return ResourceManager.GetString("LOCALHUMAN_PLACEHOLDER", resourceCulture);
             }
@@ -117,7 +144,7 @@ namespace BotzoneLocalRunner {
         /// <summary>
         ///   查找类似 所有程序 (*.exe;*.py;*.js;Main.class)|*.exe;*.py;*.js;*.class|Python 代码 (*.py)|*.py|Node.js 代码 (*.js)|*.js|Java 主类文件 |Main.class 的本地化字符串。
         /// </summary>
-        internal static string OFD_FILTER {
+        public static string OFD_FILTER {
             get {
                 return ResourceManager.GetString("OFD_FILTER", resourceCulture);
             }
@@ -126,16 +153,25 @@ namespace BotzoneLocalRunner {
         /// <summary>
         ///   查找类似 选择要运行的本地AI程序 的本地化字符串。
         /// </summary>
-        internal static string OFD_TITLE {
+        public static string OFD_TITLE {
             get {
                 return ResourceManager.GetString("OFD_TITLE", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   查找类似 人类玩家最多只能有一个 的本地化字符串。
+        /// </summary>
+        public static string TOO_MANY_HUMAN {
+            get {
+                return ResourceManager.GetString("TOO_MANY_HUMAN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Botzone上的AI只可以有0个或{0}个 的本地化字符串。
         /// </summary>
-        internal static string WRONG_BOTZONE_AI_COUNT {
+        public static string WRONG_BOTZONE_AI_COUNT {
             get {
                 return ResourceManager.GetString("WRONG_BOTZONE_AI_COUNT", resourceCulture);
             }

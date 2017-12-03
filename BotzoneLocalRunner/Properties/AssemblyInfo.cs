@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("BotzoneLocalRunner")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("zhouhy")]
 [assembly: AssemblyProduct("BotzoneLocalRunner")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright © zhouhy 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -1,19 +1,19 @@
 ﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:cefSharp="clr-namespace:CefSharp.WinForms;assembly=CefSharp.WinForms"
-        xmlns:local="clr-namespace:BotzoneLocalRunner"
-        xmlns:Forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" x:Class="BotzoneLocalRunner.MainWindow"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="518" Width="850.816" Closing="Window_Closing" Loaded="Window_Loaded">
+		xmlns:local="clr-namespace:BotzoneLocalRunner"
+		x:Class="BotzoneLocalRunner.MainWindow"
+		mc:Ignorable="d"
+		Title="MainWindow" Height="518" Width="850.816" Closing="Window_Closing" Loaded="Window_Loaded">
 	<Window.DataContext>
 		<local:MainWindowViewModel x:Name="ViewModel" />
 	</Window.DataContext>
 	<Grid Margin="0" Background="{DynamicResource Background}">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="30px"/>
+			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="313*"/>
 			<RowDefinition Height="176*"/>
 		</Grid.RowDefinitions>
@@ -22,7 +22,7 @@
 			<ColumnDefinition Width="164*"/>
 			<ColumnDefinition Width="418*"/>
 		</Grid.ColumnDefinitions>
-		<ToolBarTray Margin="0" Grid.ColumnSpan="3" Grid.RowSpan="2">
+		<ToolBarTray Margin="0" Grid.ColumnSpan="3" IsLocked="True">
 			<ToolBar Margin="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Background="#00EEF5FD">
 				<Button x:Name="btnLoad" VerticalAlignment="Center" Margin="0,0,5,0" Style="{DynamicResource ToolbarButton}">
 					<StackPanel Orientation="Horizontal">
@@ -37,26 +37,39 @@
 					</StackPanel>
 				</Button>
 			</ToolBar>
-			<ToolBar VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Background="#00EEF5FD">
-				<TextBox x:Name="txtLocalAIURL" Margin="0,0,5,0" TextWrapping="Wrap" Text="&lt;在此粘贴Botzone本地AI的URL&gt;" VerticalAlignment="Top" HorizontalAlignment="Stretch" Width="357" MouseEnter="txtLocalAIURL_MouseEnter"/>
-				<Button x:Name="btnApplyURL" VerticalAlignment="Top" Style="{DynamicResource ToolbarButton}">
-					<StackPanel Orientation="Horizontal">
-						<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.OK}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
-						<TextBlock Text="应用"/>
-					</StackPanel>
-				</Button>
+			<ToolBar VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Background="#00EEF5FD" DataContext="{Binding Credentials}">
+				<TextBox x:Name="txtLocalAIURL" Margin="0,0,5,0" TextWrapping="Wrap" Text="{Binding BotzoneCopiedURL, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Stretch" MouseEnter="txtLocalAIURL_MouseEnter" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Style="{DynamicResource ValidationTextBox}"/>
+				<Image Width="16" Margin="0" VerticalAlignment="Center">
+					<Image.Style>
+						<Style>
+							<Setter Property="Image.Source" Value="{Binding Source={x:Static local:AssetResources.Deny}, Converter={local:BitmapRGBAToWPFConverter}}"></Setter>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsValid}" Value="true">
+									<Setter Property="Image.Source" Value="{Binding Source={x:Static local:AssetResources.OK}, Converter={local:BitmapRGBAToWPFConverter}}"></Setter>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Image.Style>
+				</Image>
 			</ToolBar>
 		</ToolBarTray>
-		<Button x:Name="btnStartMatch" Margin="10,0,10,9.8" VerticalAlignment="Bottom" Height="28" Click="btnLocalAI_Click" Grid.ColumnSpan="2" ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True" ToolTipService.IsEnabled="{Binding IsValid, Converter={local:InverseBooleanConverter}}" DataContext="{Binding CurrentConfiguration}" IsEnabled="{Binding IsValid}" Grid.Row="1">
+		<Button x:Name="btnStartMatch" Margin="10,0,10,9.8" VerticalAlignment="Bottom" Height="28" Click="btnLocalAI_Click" Grid.ColumnSpan="2" ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True" IsEnabled="{Binding IsValid}" Grid.Row="1">
 			<StackPanel Orientation="Horizontal">
 				<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.Run}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
 				<TextBlock Text="开始对局"/>
 			</StackPanel>
 			<Button.ToolTip>
-				<TextBlock Text="{Binding ValidationString}" Foreground="Red" FontWeight="Bold"/>
+				<ToolTip Visibility="{Binding IsValid, Converter={local:InverseBooleanToVisibilityConverter}}">
+					<BulletDecorator>
+						<BulletDecorator.Bullet>
+							<Image Height="16" Width="16" Source="{Binding Source={x:Static local:AssetResources.Required}, Converter={local:BitmapRGBAToWPFConverter}}" Margin="0,0,5,0"/>
+						</BulletDecorator.Bullet>
+						<TextBlock Text="{Binding ValidationString}" Foreground="Red" FontWeight="Bold" Margin="5,0,0,0"/>
+					</BulletDecorator>
+				</ToolTip>
 			</Button.ToolTip>
 		</Button>
-		<WindowsFormsHost Margin="0,13,-0.2,0.8" Grid.Column="2" Grid.Row="1">
+		<WindowsFormsHost Margin="0,0,0,0" Grid.Column="2" Grid.Row="1">
 			<cefSharp:ChromiumWebBrowser x:Name="WebBrowser" Enabled="True" Dock="Fill"/>
 		</WindowsFormsHost>
 		<GroupBox Header="玩家配备" Margin="10,38.6,10,43" Grid.ColumnSpan="2" Grid.Row="1">
@@ -80,7 +93,7 @@
 										IsSynchronizedWithCurrentItem="True"
 										Grid.ColumnSpan="2"/>
 								<Button x:Name="btnSelect" Content="选择..." Tag="{Binding}" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" Click="btnSelect_Click"/>
-								<TextBox x:Name="txtContent" IsReadOnly="false" Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding ID, ValidatesOnDataErrors=True}" MouseEnter="txtContent_MouseEnter" />
+								<TextBox x:Name="txtContent" IsReadOnly="false" Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding ID, ValidatesOnDataErrors=True}" MouseEnter="txtContent_MouseEnter" Style="{DynamicResource ValidationTextBox}" />
 							</Grid>
 							<DataTemplate.Triggers>
 								<DataTrigger Binding="{Binding Type}" Value="LocalAI">
@@ -102,7 +115,12 @@
 					<ListBox x:Name="lstLog" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Logs}">
 						<ListBox.ItemTemplate>
 							<DataTemplate>
-								<TextBlock><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
+								<BulletDecorator>
+									<BulletDecorator.Bullet>
+										<Image Height="16" Width="16" Source="{Binding Level, Converter={local:LogLevelToWPFBitmapConverter}}"/>
+									</BulletDecorator.Bullet>
+									<TextBlock Padding="5,0,0,0"><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
+								</BulletDecorator>
 							</DataTemplate>
 						</ListBox.ItemTemplate>
 					</ListBox>
