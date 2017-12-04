@@ -26,7 +26,10 @@ namespace BotzoneLocalRunner
 		private string _BotzoneCopiedURL = "<在此粘贴Botzone本地AI的URL>";
 		public string BotzoneCopiedURL
 		{
-			get => _BotzoneCopiedURL;
+			get
+			{
+				return _BotzoneCopiedURL;
+			}
 			set
 			{
 				if (value != _BotzoneCopiedURL)
@@ -60,7 +63,10 @@ namespace BotzoneLocalRunner
 		private bool _IsValid = false;
 		public bool IsValid
 		{
-			get => _IsValid;
+			get
+			{
+				return _IsValid;
+			}
 			set
 			{
 				if (value != _IsValid)
@@ -75,7 +81,10 @@ namespace BotzoneLocalRunner
 		private string _ValidationString = StringResources.BAD_LOCALAI_URL;
 		public string ValidationString
 		{
-			get => _ValidationString;
+			get
+			{
+				return _ValidationString;
+			}
 			set
 			{
 				if (value != _ValidationString)
@@ -163,14 +172,15 @@ namespace BotzoneLocalRunner
 			throw new BotzoneRequestFailException((int)res.StatusCode, message);
 		}
 
-		internal static async Task FetchNextMatchRequest(this BotzoneMatch match)
+		internal static async Task<bool> FetchNextMatchRequest(this BotzoneMatch match)
 		{
 			string raw;
 			do
 			{
 				Logger.Log(LogLevel.InfoTip, "连接 Botzone，并等待新 request");
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneLocalAIURL());
-				req.Headers.Add("X-Match-" + match.MatchID, match.Runner.Responses.Last());
+				if (match.Runner.Responses.Count > 0)
+					req.Headers.Add("X-Match-" + match.MatchID, match.Runner.Responses.Last());
 				var res = await client.SendAsync(req);
 				raw = await res.Content.ReadAsStringAsync();
 				if (CheckResponse(res, raw))
@@ -183,19 +193,21 @@ namespace BotzoneLocalRunner
 			var lines = raw.Split('\n');
 			var counts = lines[0].Split(' ');
 			int reqCount = int.Parse(counts[0]), finishCount = int.Parse(counts[1]), i, j;
-			Debug.Assert(reqCount + finishCount <= 1);
+			// Debug.Assert(reqCount + finishCount <= 1);
 			for (i = 1, j = 0; j < reqCount; i += 2, j++)
 			{
-				Debug.Assert(lines[i] == match.MatchID);
+				if (lines[i] != match.MatchID)
+					continue;
 				match.Runner.Requests.Add(lines[i + 1]);
 				match.Status = MatchStatus.Running;
 				Logger.Log(LogLevel.InfoTip, $"对局 {match.MatchID} 获得一条新 request");
-				return;
+				return true;
 			}
 			for (i = 2 * reqCount + 1, j = 0; j < finishCount; i++, j++)
 			{
 				var parts = lines[i].Split(' ');
-				Debug.Assert(parts[0] == match.MatchID);
+				if (parts[0] != match.MatchID)
+					continue;
 				Debug.Assert(parts[1] == match.MySlot.ToString());
 				if (parts[2] == "0")
 				{
@@ -208,8 +220,9 @@ namespace BotzoneLocalRunner
 					Logger.Log(LogLevel.OK, $"对局 {match.MatchID} 结束，比分为 {parts.Skip(3)}，本地AI分数 {parts[3 + match.MySlot]}");
 					match.Finish(false);
 				}
-				return;
+				return false;
 			}
+			return false;
 		}
 
 		internal static async Task<string> RequestMatch(MatchConfiguration conf)
@@ -223,7 +236,7 @@ namespace BotzoneLocalRunner
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneRunMatchURL());
 				req.Headers.Add("X-Game", conf.Game.Name);
 				for (int i = 0; i < conf.Count; i++)
-					req.Headers.Add("X-Player-" + i, conf[i].Type != PlayerType.BotzoneBot ? conf[i].ID : "me");
+					req.Headers.Add("X-Player-" + i, conf[i].Type == PlayerType.BotzoneBot ? conf[i].ID : "me");
 				var res = await client.SendAsync(req);
 				matchID = await res.Content.ReadAsStringAsync();
 				if (CheckResponse(res, matchID))

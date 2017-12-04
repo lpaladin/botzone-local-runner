@@ -59,53 +59,56 @@
 			</ToolBar>
 		</ToolBarTray>
 		<TabControl Margin="0,3,0,0" Background="Transparent" RenderTransformOrigin="0.5,0.5" Grid.Row="2" Grid.ColumnSpan="2">
-			<TabItem Header="日志">
-				<Grid Background="#FFE5E5E5">
-					<ListBox x:Name="lstLog" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Logs}">
-						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<BulletDecorator>
-									<BulletDecorator.Bullet>
-										<Image Height="16" Width="16" Source="{Binding Level, Converter={local:LogLevelToWPFBitmapConverter}}"/>
-									</BulletDecorator.Bullet>
-									<TextBlock Padding="5,0,0,0"><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
-								</BulletDecorator>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
-				</Grid>
-			</TabItem>
-			<TabItem Header="过往对局">
-				<Grid Background="#FFE5E5E5">
-					<ListView x:Name="RecentMatchesView">
-						<ListView.View>
-							<GridView>
-								<GridViewColumn/>
-							</GridView>
-						</ListView.View>
-					</ListView>
-				</Grid>
-			</TabItem>
-			<ItemsControl ItemsSource="{Binding CurrentConfiguration}">
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<TabItem x:Name="tabOutput" IsEnabled="False">
-							<TabItem.Header>
-								<TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex), 
-									RelativeSource={RelativeSource TemplatedParent}, 
-									StringFormat={}{0}号玩家程序输出}">
-								</TextBlock>
-							</TabItem.Header>
-							<TextBox IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" />
-						</TabItem>
-						<DataTemplate.Triggers>
-							<DataTrigger Binding="{Binding Type}" Value="LocalAI">
-								<Setter Property="IsEnabled" Value="True" TargetName="tabOutput"/>
-							</DataTrigger>
-						</DataTemplate.Triggers>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
+			<TabControl.ItemsSource>
+				<CompositeCollection>
+					<TabItem Header="日志">
+						<Grid Background="#FFE5E5E5">
+							<ListBox x:Name="lstLog" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Logs}" ScrollViewer.ScrollChanged="lstLog_ScrollChanged">
+								<ListBox.ItemTemplate>
+									<DataTemplate>
+										<BulletDecorator>
+											<BulletDecorator.Bullet>
+												<Image Height="16" Width="16" Source="{Binding Level, Converter={local:LogLevelToWPFBitmapConverter}}"/>
+											</BulletDecorator.Bullet>
+											<TextBlock Padding="5,0,0,0"><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
+										</BulletDecorator>
+									</DataTemplate>
+								</ListBox.ItemTemplate>
+							</ListBox>
+						</Grid>
+					</TabItem>
+					<TabItem Header="过往对局">
+						<Grid Background="#FFE5E5E5">
+							<ListView x:Name="RecentMatchesView">
+								<ListView.View>
+									<GridView>
+										<GridViewColumn/>
+									</GridView>
+								</ListView.View>
+							</ListView>
+						</Grid>
+					</TabItem>
+					<CollectionContainer Collection="{Binding CurrentConfiguration}" />
+				</CompositeCollection>
+			</TabControl.ItemsSource>
+			<TabControl.ItemTemplate>
+				<DataTemplate>
+					<TabItem x:Name="tabOutput" IsEnabled="False">
+						<TabItem.Header>
+							<TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex), 
+								RelativeSource={RelativeSource TemplatedParent}, 
+								StringFormat={}{0}号玩家程序输出}">
+							</TextBlock>
+						</TabItem.Header>
+						<TextBox IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" />
+					</TabItem>
+					<DataTemplate.Triggers>
+						<DataTrigger Binding="{Binding Type}" Value="LocalAI">
+							<Setter Property="IsEnabled" Value="True" TargetName="tabOutput"/>
+						</DataTrigger>
+					</DataTemplate.Triggers>
+				</DataTemplate>
+			</TabControl.ItemTemplate>
 		</TabControl>
 		<Expander ExpandDirection="Left" Margin="0" IsExpanded="True" Grid.Row="1">
 			<Expander.Header>
@@ -121,13 +124,22 @@
 				</TextBlock>
 			</Expander.Header>
 			<Grid Width="227" Margin="5">
+				<Grid.Style>
+					<Style>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding MatchStarted}" Value="True">
+								<Setter Property="Grid.IsEnabled" Value="False" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Grid.Style>
 				<BulletDecorator Height="21" VerticalAlignment="Top">
 					<BulletDecorator.Bullet>
 						<Label Content="游戏" Margin="0,0,0,0" Padding="5,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
 					</BulletDecorator.Bullet>
 					<ComboBox Margin="0,0,0,0" IsEnabled="{Binding GamesLoaded}" SelectedIndex="0" ItemsSource="{Binding AllGames}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentConfiguration.Game}" IsSynchronizedWithCurrentItem="True"/>
 				</BulletDecorator>
-				<GroupBox Header="玩家配备" Margin="0,48,0,49">
+				<GroupBox Header="玩家配备" Margin="0,26,0,45">
 					<ScrollViewer VerticalScrollBarVisibility="Auto">
 						<ItemsControl ItemsSource="{Binding CurrentConfiguration}" ScrollViewer.CanContentScroll="True">
 							<ItemsControl.ItemTemplate>
@@ -180,13 +192,19 @@
 						<TextBlock Text="开始对局"/>
 					</StackPanel>
 				</Button>
-				<TextBlock Margin="10,0,10,25" TextWrapping="Wrap" Height="15" VerticalAlignment="Bottom">
+				<TextBlock Margin="10,0,10,25" TextWrapping="Wrap" Height="15" VerticalAlignment="Bottom" HorizontalAlignment="Center">
 					<TextBlock.Style>
 						<Style>
 							<Setter Property="TextBlock.Text" Value="{x:Static local:StringResources.BOTZONE_MATCH}"/>
+							<Setter Property="TextBlock.Foreground" Value="#FF804600"/>
 							<Style.Triggers>
-								<DataTrigger Binding="{Binding CurrentConfiguration.IsLocalMatch}">
+								<DataTrigger Binding="{Binding CurrentConfiguration.IsLocalMatch}" Value="True">
 									<Setter Property="TextBlock.Text" Value="{x:Static local:StringResources.LOCAL_MATCH}"/>
+									<Setter Property="TextBlock.Foreground" Value="#FF178000"/>
+								</DataTrigger>
+								<DataTrigger Binding="{Binding CurrentConfiguration.Game}" Value="{x:Null}">
+									<Setter Property="TextBlock.Text" Value="{x:Static local:StringResources.CHOOSE_GAME_FIRST}"/>
+									<Setter Property="TextBlock.Foreground" Value="#FFFF0000"/>
 								</DataTrigger>
 							</Style.Triggers>
 						</Style>

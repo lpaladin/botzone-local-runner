@@ -144,6 +144,9 @@
   <data name="ID_EMPTY" xml:space="preserve">
     <value>玩家ID不可为空</value>
   </data>
+  <data name="LOCALAI_PATH_EMPTY" xml:space="preserve">
+    <value>本地AI路径不可为空</value>
+  </data>
   <data name="LOCALAI_PLACEHOLDER" xml:space="preserve">
     <value>&lt;请使用选择按钮选择程序&gt;</value>
   </data>

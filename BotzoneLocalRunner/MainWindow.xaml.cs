@@ -13,70 +13,80 @@ using System.Text.RegularExpressions;
 
 namespace BotzoneLocalRunner
 {
-    internal static class NativeMethods
-    {
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool AddClipboardFormatListener(IntPtr hwnd);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
-    }
-
-    public class MainWindowViewModel : INotifyPropertyChanged
+	internal static class NativeMethods
 	{
-        private BotzoneCredentials _Credentials;
-        public BotzoneCredentials Credentials
-        {
-            get => _Credentials;
-            set
-            {
-                if (value != _Credentials)
-                {
-                    if (_Credentials != null)
-                        _Credentials.ValidationChanged -= UpdateValidation;
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool AddClipboardFormatListener(IntPtr hwnd);
 
-                    _Credentials = value;
-                    _Credentials.ValidationChanged += UpdateValidation;
-                    NotifyPropertyChanged("Credentials");
-                }
-            }
-        }
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
+	}
 
-        private MatchConfiguration _CurrentConfiguration;
-		public MatchConfiguration CurrentConfiguration {
-			get => _CurrentConfiguration;
+	public class MainWindowViewModel : INotifyPropertyChanged
+	{
+		private BotzoneCredentials _Credentials;
+		public BotzoneCredentials Credentials
+		{
+			get
+			{
+				return _Credentials;
+			}
+			set
+			{
+				if (value != _Credentials)
+				{
+					if (_Credentials != null)
+						_Credentials.ValidationChanged -= UpdateValidation;
+
+					_Credentials = value;
+					_Credentials.ValidationChanged += UpdateValidation;
+					NotifyPropertyChanged("Credentials");
+				}
+			}
+		}
+
+		private MatchConfiguration _CurrentConfiguration;
+		public MatchConfiguration CurrentConfiguration
+		{
+			get
+			{
+				return _CurrentConfiguration;
+			}
 			set
 			{
 				if (value != _CurrentConfiguration)
 				{
-                    if (_CurrentConfiguration != null)
-                        _CurrentConfiguration.ValidationChanged -= UpdateValidation;
+					if (_CurrentConfiguration != null)
+						_CurrentConfiguration.ValidationChanged -= UpdateValidation;
 
-                    _CurrentConfiguration = value;
-                    _CurrentConfiguration.ValidationChanged += UpdateValidation;
+					_CurrentConfiguration = value;
+					_CurrentConfiguration.ValidationChanged += UpdateValidation;
 					NotifyPropertyChanged("CurrentConfiguration");
 				}
 			}
 		}
 
-        private void UpdateValidation(object sender, System.EventArgs e)
-        {
-            if (Credentials?.IsValid == false)
-            {
-                IsValid = false;
-                ValidationString = Credentials.ValidationString;
-                return;
-            }
-            IsValid = CurrentConfiguration.IsValid;
-            ValidationString = CurrentConfiguration.ValidationString;
-        }
+		private void UpdateValidation(object sender, System.EventArgs e)
+		{
+			if (Credentials?.IsValid == false)
+			{
+				IsValid = false;
+				ValidationString = Credentials.ValidationString;
+				return;
+			}
+			IsValid = CurrentConfiguration.IsValid;
+			ValidationString = CurrentConfiguration.ValidationString;
+		}
 
-        private RangeObservableCollection<Game> _AllGames;
+		private RangeObservableCollection<Game> _AllGames;
 		public RangeObservableCollection<Game> AllGames
 		{
-			get => _AllGames;
+			get
+			{
+				return _AllGames;
+			}
 			set
 			{
 				if (value != _AllGames)
@@ -90,7 +100,10 @@ namespace BotzoneLocalRunner
 		private ObservableCollection<ViewModelLogger.LogItem> _Logs;
 		public ObservableCollection<ViewModelLogger.LogItem> Logs
 		{
-			get => _Logs;
+			get
+			{
+				return _Logs;
+			}
 			set
 			{
 				if (value != _Logs)
@@ -104,7 +117,10 @@ namespace BotzoneLocalRunner
 		private bool _MatchStarted = false;
 		public bool MatchStarted
 		{
-			get => _MatchStarted;
+			get
+			{
+				return _MatchStarted;
+			}
 			set
 			{
 				if (value != _MatchStarted)
@@ -118,7 +134,10 @@ namespace BotzoneLocalRunner
 		private bool _GamesLoaded = false;
 		public bool GamesLoaded
 		{
-			get => _GamesLoaded;
+			get
+			{
+				return _GamesLoaded;
+			}
 			set
 			{
 				if (value != _GamesLoaded)
@@ -127,38 +146,44 @@ namespace BotzoneLocalRunner
 					NotifyPropertyChanged("GamesLoaded");
 				}
 			}
-        }
+		}
 
-        private bool _IsValid = false;
-        public bool IsValid
-        {
-            get => _IsValid;
-            set
-            {
-                if (value != _IsValid)
-                {
-                    _IsValid = value;
-                    NotifyPropertyChanged("IsValid");
-                }
-            }
-        }
+		private bool _IsValid = false;
+		public bool IsValid
+		{
+			get
+			{
+				return _IsValid;
+			}
+			set
+			{
+				if (value != _IsValid)
+				{
+					_IsValid = value;
+					NotifyPropertyChanged("IsValid");
+				}
+			}
+		}
 
 
-        private string _ValidationString = StringResources.BAD_LOCALAI_URL;
-        public string ValidationString
-        {
-            get => _ValidationString;
-            set
-            {
-                if (value != _ValidationString)
-                {
-                    _ValidationString = value;
-                    NotifyPropertyChanged("ValidationString");
-                }
-            }
-        }
+		private string _ValidationString = StringResources.BAD_LOCALAI_URL;
+		public string ValidationString
+		{
+			get
+			{
+				return _ValidationString;
+			}
+			set
+			{
+				if (value != _ValidationString)
+				{
+					_ValidationString = value;
+					NotifyPropertyChanged("ValidationString");
+				}
+			}
+		}
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
+		private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -168,51 +193,51 @@ namespace BotzoneLocalRunner
 	/// MainWindow.xaml 的交互逻辑
 	/// </summary>
 	public partial class MainWindow : Window
-    {
-        private const int WM_CLIPBOARDUPDATE = 0x031D;
-        private IntPtr hwnd;
+	{
+		private const int WM_CLIPBOARDUPDATE = 0x031D;
+		private IntPtr hwnd;
 
-        OpenFileDialog ofd = new OpenFileDialog
+		OpenFileDialog ofd = new OpenFileDialog
 		{
 			ValidateNames = true,
 			Title = StringResources.OFD_TITLE,
 			Filter = StringResources.OFD_FILTER
 		};
 
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-            hwnd = new WindowInteropHelper(this).EnsureHandle();
-            HwndSource.FromHwnd(hwnd)?.AddHook(WndProc);
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
+			hwnd = new WindowInteropHelper(this).EnsureHandle();
+			HwndSource.FromHwnd(hwnd)?.AddHook(WndProc);
 
-            NativeMethods.AddClipboardFormatListener(hwnd);
-        }
+			NativeMethods.AddClipboardFormatListener(hwnd);
+		}
 
-        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if (msg == WM_CLIPBOARDUPDATE)
-            {
-                IDataObject iData = Clipboard.GetDataObject();
-                
-                if (iData.GetDataPresent(DataFormats.Text))
-                {
-                    string text = (string)iData.GetData(DataFormats.Text);
-                    if (Regex.IsMatch(text, StringResources.BOTZONE_LOCALAI_URL_REGEX))
-                        ViewModel.Credentials.BotzoneCopiedURL = text;
-                }
-            }
+		private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+		{
+			if (msg == WM_CLIPBOARDUPDATE)
+			{
+				IDataObject iData = Clipboard.GetDataObject();
 
-            return IntPtr.Zero;
-        }
-        
+				if (iData.GetDataPresent(DataFormats.Text))
+				{
+					string text = (string)iData.GetData(DataFormats.Text);
+					if (Regex.IsMatch(text, StringResources.BOTZONE_LOCALAI_URL_REGEX))
+						ViewModel.Credentials.BotzoneCopiedURL = text;
+				}
+			}
 
-        public MainWindow()
+			return IntPtr.Zero;
+		}
+
+
+		public MainWindow()
 		{
 			InitializeComponent();
 
 			ViewModel.CurrentConfiguration = new MatchConfiguration();
-            BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
-			ViewModel.AllGames = new RangeObservableCollection<Game>(new [] { new Game { Name = "..." } });
+			BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
+			ViewModel.AllGames = new RangeObservableCollection<Game>(new[] { new Game { Name = "..." } });
 			ViewModel.Logs = new ObservableCollection<ViewModelLogger.LogItem>();
 
 			if (Properties.Settings.Default.LastBotzoneLocalAIURL?.Length > 0)
@@ -236,8 +261,8 @@ namespace BotzoneLocalRunner
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			Cef.Shutdown();
-            NativeMethods.RemoveClipboardFormatListener(hwnd);
-        }
+			NativeMethods.RemoveClipboardFormatListener(hwnd);
+		}
 
 		private async void Window_Loaded(object sender, RoutedEventArgs e)
 		{
@@ -279,11 +304,21 @@ namespace BotzoneLocalRunner
 			var conf = ViewModel.CurrentConfiguration;
 			var matchID = await BotzoneProtocol.RequestMatch(conf);
 			var match = new BotzoneMatch(conf, matchID);
-			while (match.Status != MatchStatus.Finished || match.Status != MatchStatus.Aborted)
+			ViewModel.MatchStarted = true;
+			while (true)
 			{
-				await match.FetchNextMatchRequest();
+				while (!await match.FetchNextMatchRequest()) ;
+				if (match.Status == MatchStatus.Finished || match.Status == MatchStatus.Aborted)
+					break;
 				await match.Runner.RunForResponse();
 			}
+			ViewModel.MatchStarted = false;
+		}
+
+		private void lstLog_ScrollChanged(object sender, ScrollChangedEventArgs e)
+		{
+			if (e.ExtentHeightChange > 0.0)
+				((ScrollViewer)e.OriginalSource).ScrollToEnd();
 		}
 	}
 }

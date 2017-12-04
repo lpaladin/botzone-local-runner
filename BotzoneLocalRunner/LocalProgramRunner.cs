@@ -27,11 +27,13 @@ namespace BotzoneLocalRunner
 			p.StandardInput.WriteLine(Requests.Last());
 			p.StandardInput.Close();
 
-			return new Task(() =>
+			var t = new Task(() =>
 			{
 				p.WaitForExit();
 				Responses.Add(p.StandardOutput.ReadLine());
 			});
+			t.Start();
+			return t;
 		}
 
 		internal Process RunProgram()
@@ -40,21 +42,22 @@ namespace BotzoneLocalRunner
 			{
 				CreateNoWindow = true, RedirectStandardInput = true,
 				RedirectStandardError = true, RedirectStandardOutput = true,
+				UseShellExecute = false,
 				WorkingDirectory = Path.GetDirectoryName(ProgramPath)
 			};
 
 			switch (Path.GetExtension(ProgramPath))
 			{
-				case "exe":
+				case ".exe":
 					processInfo.FileName = ProgramPath;
 					break;
-				case "py":
+				case ".py":
 					processInfo.FileName = "python " + ProgramPath;
 					break;
-				case "js":
+				case ".js":
 					processInfo.FileName = "node " + ProgramPath;
 					break;
-				case "class":
+				case ".class":
 					processInfo.FileName = "java " + Path.GetFileNameWithoutExtension(ProgramPath);
 					break;
 				default:

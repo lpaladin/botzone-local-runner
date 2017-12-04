@@ -32,7 +32,10 @@ namespace BotzoneLocalRunner
 		private PlayerType _Type = PlayerType.LocalAI;
 		public PlayerType Type
 		{
-			get => _Type;
+			get
+			{
+				return _Type;
+			}
 			set
 			{
 				if (value != _Type)
@@ -53,7 +56,10 @@ namespace BotzoneLocalRunner
 		private string _ID = StringResources.LOCALAI_PLACEHOLDER;
 		public string ID
 		{
-			get => _ID;
+			get
+			{
+				return _ID;
+			}
 			set
 			{
 				if (value != _ID)
@@ -66,7 +72,9 @@ namespace BotzoneLocalRunner
 					else
 					{
 						IsValid = false;
-						ValidationString = StringResources.ID_EMPTY;
+						ValidationString = Type == PlayerType.LocalAI ?
+							StringResources.LOCALAI_PATH_EMPTY :
+							StringResources.ID_EMPTY;
 					}
 					NotifyPropertyChanged("ID");
 				}
@@ -76,7 +84,10 @@ namespace BotzoneLocalRunner
 		private bool _IsValid = false;
 		public bool IsValid
 		{
-			get => _IsValid;
+			get
+			{
+				return _IsValid;
+			}
 			set
 			{
 				if (value != _IsValid)
@@ -87,10 +98,13 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		private string _ValidationString = StringResources.ID_EMPTY;
+		private string _ValidationString = StringResources.LOCALAI_PATH_EMPTY;
 		public string ValidationString
 		{
-			get => _ValidationString;
+			get
+			{
+				return _ValidationString;
+			}
 			set
 			{
 				if (value != _ValidationString)
@@ -124,13 +138,18 @@ namespace BotzoneLocalRunner
 		private Game _Game;
 		public Game Game
 		{
-			get => _Game;
+			get
+			{
+				return _Game;
+			}
 			set
 			{
 				if (value != _Game)
 				{
 					if (value == null)
+					{
 						Clear();
+					}
 					else
 					{
 						while (value.PlayerCount > Count)
@@ -138,8 +157,10 @@ namespace BotzoneLocalRunner
 						while (value.PlayerCount < Count)
 							RemoveAt(Count - 1);
 					}
+
 					_Game = value;
 					OnPropertyChanged(new PropertyChangedEventArgs("Game"));
+					PlayerConfigurationPropertyChanged(null, null);
 				}
 			}
 		}
@@ -148,7 +169,10 @@ namespace BotzoneLocalRunner
 		private bool _IsLocalMatch;
 		public bool IsLocalMatch
 		{
-			get => _IsLocalMatch;
+			get
+			{
+				return _IsLocalMatch;
+			}
 			set
 			{
 				if (value != _IsLocalMatch)
@@ -162,7 +186,10 @@ namespace BotzoneLocalRunner
 		private bool _IsValid = false;
 		public bool IsValid
 		{
-			get => _IsValid;
+			get
+			{
+				return _IsValid;
+			}
 			set
 			{
 				if (value != _IsValid)
@@ -177,7 +204,10 @@ namespace BotzoneLocalRunner
 		private string _ValidationString = StringResources.CHOOSE_GAME_FIRST;
 		public string ValidationString
 		{
-			get => _ValidationString;
+			get
+			{
+				return _ValidationString;
+			}
 			set
 			{
 				if (value != _ValidationString)
@@ -202,19 +232,31 @@ namespace BotzoneLocalRunner
 					item.PropertyChanged += PlayerConfigurationPropertyChanged;
 		}
 
+		private void ValidationFailDueTo(string message)
+		{
+			IsValid = false;
+			ValidationString = message;
+			ValidationChanged(this, null);
+		}
+
 		public void PlayerConfigurationPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			int botzoneAICount = 0, localAICount = 0, humanCount = 0;
+			if (Game == null || Game.PlayerCount == 0)
+			{
+				ValidationFailDueTo(StringResources.CHOOSE_GAME_FIRST);
+				return;
+			}
+
 			IsLocalMatch = this.All(x => x.Type != PlayerType.BotzoneBot);
 			foreach (var config in this)
 			{
 				if (!config.IsValid)
 				{
-					IsValid = false;
-					ValidationString = StringResources.ID_EMPTY;
-					ValidationChanged(this, null);
+					ValidationFailDueTo(config.ValidationString);
 					return;
 				}
+
 				if (config.Type == PlayerType.BotzoneBot)
 					botzoneAICount++;
 				else if (config.Type == PlayerType.LocalAI)
@@ -224,23 +266,17 @@ namespace BotzoneLocalRunner
 			}
 			if (humanCount > 1)
 			{
-				IsValid = false;
-				ValidationString = StringResources.TOO_MANY_HUMAN;
-				ValidationChanged(this, null);
+				ValidationFailDueTo(StringResources.TOO_MANY_HUMAN);
 				return;
 			}
 			if (!IsLocalMatch && humanCount > 0)
 			{
-				IsValid = false;
-				ValidationString = StringResources.BOTZONE_MATCH_NO_HUMAN;
-				ValidationChanged(this, null);
+				ValidationFailDueTo(StringResources.BOTZONE_MATCH_NO_HUMAN);
 				return;
 			}
 			if (!IsLocalMatch && localAICount > 1)
 			{
-				IsValid = false;
-				ValidationString = StringResources.BOTZONE_MATCH_ONE_LOCALAI;
-				ValidationChanged(this, null);
+				ValidationFailDueTo(StringResources.BOTZONE_MATCH_ONE_LOCALAI);
 				return;
 			}
 			IsValid = true;
