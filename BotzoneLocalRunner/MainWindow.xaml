@@ -3,6 +3,7 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
 		xmlns:cefSharp="clr-namespace:CefSharp.WinForms;assembly=CefSharp.WinForms"
 		xmlns:local="clr-namespace:BotzoneLocalRunner"
 		x:Class="BotzoneLocalRunner.MainWindow"
@@ -58,57 +59,82 @@
 				</Image>
 			</ToolBar>
 		</ToolBarTray>
-		<TabControl Margin="0,3,0,0" Background="Transparent" RenderTransformOrigin="0.5,0.5" Grid.Row="2" Grid.ColumnSpan="2">
+		<TabControl Margin="0,3,0,0" Background="Transparent" RenderTransformOrigin="0.5,0.5" Grid.Row="2" Grid.ColumnSpan="2" SelectionChanged="TabControl_SelectionChanged">
+			<TabControl.ItemContainerStyle>
+				<Style TargetType="{x:Type TabItem}">
+					<Setter Property="IsEnabled" Value="True"/>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Type}" Value="LocalHuman">
+							<Setter Property="IsEnabled" Value="False"/>
+						</DataTrigger>
+						<DataTrigger Binding="{Binding Type}" Value="BotzoneBot">
+							<Setter Property="IsEnabled" Value="False"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</TabControl.ItemContainerStyle>
+			<TabControl.ContentTemplate>
+				<DataTemplate DataType="{x:Type local:PlayerConfiguration}">
+					<TextBox x:Name="List" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible"
+							 UndoLimit="0" Text="{Binding LogContent}" ScrollViewer.ScrollChanged="ScrollChangedAndScrollToEnd">
+						<!--<i:Interaction.Behaviors>
+							<local:AppendTextBehavior AppendTextAction="{Binding AppendLogAction, Mode=OneWayToSource}" />
+						</i:Interaction.Behaviors>-->
+					</TextBox>
+				</DataTemplate>
+			</TabControl.ContentTemplate>
+			<TabControl.ItemTemplate>
+				<DataTemplate DataType="{x:Type local:PlayerConfiguration}">
+					<TextBlock Text="{Binding Path=SlotID,
+							StringFormat={}{0}号玩家程序输出}">
+					</TextBlock>
+				</DataTemplate>
+			</TabControl.ItemTemplate>
+			<TabControl.Resources>
+				<CollectionViewSource Source="{Binding CurrentConfiguration}" x:Key="ConfigurationSource" />
+				<CollectionViewSource Source="{Binding Logs}" x:Key="LogSource" />
+			</TabControl.Resources>
 			<TabControl.ItemsSource>
 				<CompositeCollection>
 					<TabItem Header="日志">
-						<Grid Background="#FFE5E5E5">
-							<ListBox x:Name="lstLog" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Logs}" ScrollViewer.ScrollChanged="lstLog_ScrollChanged">
-								<ListBox.ItemTemplate>
-									<DataTemplate>
-										<BulletDecorator>
-											<BulletDecorator.Bullet>
-												<Image Height="16" Width="16" Source="{Binding Level, Converter={local:LogLevelToWPFBitmapConverter}}"/>
-											</BulletDecorator.Bullet>
-											<TextBlock Padding="5,0,0,0"><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
-										</BulletDecorator>
-									</DataTemplate>
-								</ListBox.ItemTemplate>
-							</ListBox>
-						</Grid>
+						<TabItem.ContentTemplate>
+							<DataTemplate>
+								<Grid Background="#FFE5E5E5">
+									<ListBox x:Name="List" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Source={StaticResource ResourceKey=LogSource}}" ScrollViewer.ScrollChanged="ScrollChangedAndScrollToEnd">
+										<ListBox.ItemTemplate>
+											<DataTemplate>
+												<BulletDecorator>
+													<BulletDecorator.Bullet>
+														<Image Height="16" Width="16" Source="{Binding Level, Converter={local:LogLevelToWPFBitmapConverter}}"/>
+													</BulletDecorator.Bullet>
+													<TextBlock Padding="5,0,0,0"><Run Foreground="#FFC78107" Text="{Binding Date}" /><Run Text=" "/><Run Text="{Binding Message}" /></TextBlock>
+												</BulletDecorator>
+											</DataTemplate>
+										</ListBox.ItemTemplate>
+									</ListBox>
+								</Grid>
+							</DataTemplate>
+						</TabItem.ContentTemplate>
 					</TabItem>
 					<TabItem Header="过往对局">
-						<Grid Background="#FFE5E5E5">
-							<ListView x:Name="RecentMatchesView">
-								<ListView.View>
-									<GridView>
-										<GridViewColumn/>
-									</GridView>
-								</ListView.View>
-							</ListView>
-						</Grid>
+						<TabItem.ContentTemplate>
+							<DataTemplate>
+								<Grid Background="#FFE5E5E5">
+									<ListView x:Name="List">
+										<ListView.View>
+											<GridView>
+												<GridViewColumn/>
+											</GridView>
+										</ListView.View>
+									</ListView>
+								</Grid>
+							</DataTemplate>
+						</TabItem.ContentTemplate>
 					</TabItem>
-					<CollectionContainer Collection="{Binding CurrentConfiguration}" />
+					<!-- Hack...CollectionContainer无法继承DataSource（是的，Window的也不行） -->
+					<CollectionContainer Collection="{Binding Source={StaticResource ResourceKey=ConfigurationSource}}" />
 				</CompositeCollection>
 			</TabControl.ItemsSource>
-			<TabControl.ItemTemplate>
-				<DataTemplate>
-					<TabItem x:Name="tabOutput" IsEnabled="False">
-						<TabItem.Header>
-							<TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex), 
-								RelativeSource={RelativeSource TemplatedParent}, 
-								StringFormat={}{0}号玩家程序输出}">
-							</TextBlock>
-						</TabItem.Header>
-						<TextBox IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" />
-					</TabItem>
-					<DataTemplate.Triggers>
-						<DataTrigger Binding="{Binding Type}" Value="LocalAI">
-							<Setter Property="IsEnabled" Value="True" TargetName="tabOutput"/>
-						</DataTrigger>
-					</DataTemplate.Triggers>
-				</DataTemplate>
-			</TabControl.ItemTemplate>
 		</TabControl>
 		<Expander ExpandDirection="Left" Margin="0" IsExpanded="True" Grid.Row="1">
 			<Expander.Header>

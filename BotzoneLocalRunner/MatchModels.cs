@@ -62,6 +62,7 @@ namespace BotzoneLocalRunner
 		public static BotzoneMatch ActiveMatch;
 		public int MySlot { get; }
 		public string MatchID { get; }
+		public PlayerConfiguration MyConf { get; }
 		public LocalProgramRunner Runner { get; }
 
 		public BotzoneMatch(MatchConfiguration conf, string matchID)
@@ -71,6 +72,7 @@ namespace BotzoneLocalRunner
 			for (int i = 0; i < conf.Count; i++)
 				if (conf[i].Type != PlayerType.BotzoneBot)
 					MySlot = i;
+			MyConf = Configuration[MySlot];
 			Runner = new LocalProgramRunner
 			{
 				ProgramPath = conf[MySlot].ID

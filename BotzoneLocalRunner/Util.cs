@@ -9,7 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Interactivity;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -148,7 +150,25 @@ namespace BotzoneLocalRunner
 		public override object ProvideValue(IServiceProvider serviceProvider)
 			=> this;
 	}
-#endregion
+
+	public class AppendTextBehavior : Behavior<TextBox>
+	{
+		public Action<string> AppendTextAction
+		{
+			get { return (Action<string>)GetValue(AppendTextActionProperty); }
+			set { SetValue(AppendTextActionProperty, value); }
+		}
+		
+		public static readonly DependencyProperty AppendTextActionProperty =
+			DependencyProperty.Register("AppendTextAction", typeof(Action<string>), typeof(AppendTextBehavior), new PropertyMetadata(null));
+
+		protected override void OnAttached()
+		{
+			SetCurrentValue(AppendTextActionProperty, (Action<string>)AssociatedObject.AppendText);
+			base.OnAttached();
+		}
+	}
+	#endregion
 
 	internal static class Util
     {

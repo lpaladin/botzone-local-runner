@@ -7,9 +7,11 @@ using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
 using System;
+using System.Linq;
 using System.Globalization;
 using System.Windows.Interop;
 using System.Text.RegularExpressions;
+using static BotzoneLocalRunner.Util;
 
 namespace BotzoneLocalRunner
 {
@@ -243,7 +245,7 @@ namespace BotzoneLocalRunner
 			if (Properties.Settings.Default.LastBotzoneLocalAIURL?.Length > 0)
 				BotzoneProtocol.Credentials.BotzoneCopiedURL = Properties.Settings.Default.LastBotzoneLocalAIURL;
 
-			Util.Logger = new ViewModelLogger(ViewModel.Logs);
+			Logger = new ViewModelLogger(ViewModel.Logs);
 			WebBrowser.BrowserSettings = new BrowserSettings
 			{
 				AcceptLanguageList =
@@ -301,24 +303,47 @@ namespace BotzoneLocalRunner
 
 		private async void btnStartMatch_Click(object sender, RoutedEventArgs e)
 		{
-			var conf = ViewModel.CurrentConfiguration;
-			var matchID = await BotzoneProtocol.RequestMatch(conf);
-			var match = new BotzoneMatch(conf, matchID);
-			ViewModel.MatchStarted = true;
-			while (true)
+			try
 			{
-				while (!await match.FetchNextMatchRequest()) ;
-				if (match.Status == MatchStatus.Finished || match.Status == MatchStatus.Aborted)
-					break;
-				await match.Runner.RunForResponse();
+				var conf = ViewModel.CurrentConfiguration;
+				var matchID = await BotzoneProtocol.RequestMatch(conf);
+				var match = new BotzoneMatch(conf, matchID);
+				ViewModel.MatchStarted = true;
+				while (true)
+				{
+					while (!await match.FetchNextMatchRequest()) ;
+					if (match.Status == MatchStatus.Finished || match.Status == MatchStatus.Aborted)
+						break;
+					match.MyConf.LogContent += (">>> REQUEST" +
+						Environment.NewLine + match.Runner.Requests.Last() + Environment.NewLine);
+					await match.Runner.RunForResponse();
+					match.MyConf.LogContent += ("<<< RESPONSE" +
+						Environment.NewLine + match.Runner.Responses.Last() + Environment.NewLine);
+				}
 			}
-			ViewModel.MatchStarted = false;
+			catch
+			{
+				Logger.Log(LogLevel.No, "对局失败");
+			}
+			finally
+			{
+				ViewModel.MatchStarted = false;
+			}
 		}
 
-		private void lstLog_ScrollChanged(object sender, ScrollChangedEventArgs e)
+		private void ScrollChangedAndScrollToEnd(object sender, ScrollChangedEventArgs e)
 		{
 			if (e.ExtentHeightChange > 0.0)
 				((ScrollViewer)e.OriginalSource).ScrollToEnd();
+		}
+
+		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var tab = sender as TabControl;
+			if (tab == null)
+				return;
+			var item = tab.ItemContainerGenerator.ContainerFromIndex(tab.SelectedIndex) as TabItem;
+			var c = item.Content;
 		}
 	}
 }

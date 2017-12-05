@@ -52,6 +52,7 @@ namespace BotzoneLocalRunner
 			}
 		}
 
+		public int SlotID { get; set; }
 
 		private string _ID = StringResources.LOCALAI_PLACEHOLDER;
 		public string ID
@@ -77,6 +78,21 @@ namespace BotzoneLocalRunner
 							StringResources.ID_EMPTY;
 					}
 					NotifyPropertyChanged("ID");
+				}
+			}
+		}
+
+
+		private string _LogContent;
+		public string LogContent
+		{
+			get => _LogContent;
+			set
+			{
+				if (value != _LogContent)
+				{
+					_LogContent = value;
+					NotifyPropertyChanged("LogContent");
 				}
 			}
 		}
@@ -153,7 +169,7 @@ namespace BotzoneLocalRunner
 					else
 					{
 						while (value.PlayerCount > Count)
-							Add(new PlayerConfiguration());
+							Add(new PlayerConfiguration { SlotID = Count });
 						while (value.PlayerCount < Count)
 							RemoveAt(Count - 1);
 					}
@@ -164,7 +180,6 @@ namespace BotzoneLocalRunner
 				}
 			}
 		}
-
 
 		private bool _IsLocalMatch;
 		public bool IsLocalMatch
