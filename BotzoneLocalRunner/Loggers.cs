@@ -89,22 +89,28 @@ namespace BotzoneLocalRunner
 
         public override object ProvideValue(IServiceProvider serviceProvider)
             => this;
-    }
+	}
+
+	public class LogItem
+	{
+		public LogLevel Level { get; set; }
+		public string Date { get; set; }
+		public string Message { get; set; }
+	}
+
+	public class LogCollection : ObservableCollection<LogItem>
+	{
+
+	}
 
     public class ViewModelLogger : ILogger
 	{
-		public class LogItem
-		{
-			public LogLevel Level { get; set; }
-			public string Date { get; set; }
-			public string Message { get; set; }
-        }
 
         static readonly int LogMaxLength = 4096;
 
-		ObservableCollection<LogItem> ViewModel { get; }
+		LogCollection ViewModel { get; }
 
-		internal ViewModelLogger(ObservableCollection<LogItem> viewModel)
+		internal ViewModelLogger(LogCollection viewModel)
 		{
 			ViewModel = viewModel;
 		}

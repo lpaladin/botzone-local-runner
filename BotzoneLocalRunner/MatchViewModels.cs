@@ -297,6 +297,19 @@ namespace BotzoneLocalRunner
 			IsValid = true;
 			ValidationChanged(this, null);
 		}
+
+		internal async Task<Match> CreateMatch()
+		{
+			if (!IsLocalMatch)
+			{
+				var matchID = await BotzoneProtocol.RequestMatch(this);
+				return new BotzoneMatch(this, matchID);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 
 }

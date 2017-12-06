@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Windows.Interop;
 using System.Text.RegularExpressions;
 using static BotzoneLocalRunner.Util;
+using System.Windows.Media;
 
 namespace BotzoneLocalRunner
 {
@@ -28,6 +29,7 @@ namespace BotzoneLocalRunner
 
 	public class MainWindowViewModel : INotifyPropertyChanged
 	{
+
 		private BotzoneCredentials _Credentials;
 		public BotzoneCredentials Credentials
 		{
@@ -99,8 +101,8 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		private ObservableCollection<ViewModelLogger.LogItem> _Logs;
-		public ObservableCollection<ViewModelLogger.LogItem> Logs
+		private LogCollection _Logs;
+		public LogCollection Logs
 		{
 			get
 			{
@@ -240,7 +242,7 @@ namespace BotzoneLocalRunner
 			ViewModel.CurrentConfiguration = new MatchConfiguration();
 			BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
 			ViewModel.AllGames = new RangeObservableCollection<Game>(new[] { new Game { Name = "..." } });
-			ViewModel.Logs = new ObservableCollection<ViewModelLogger.LogItem>();
+			ViewModel.Logs = new LogCollection();
 
 			if (Properties.Settings.Default.LastBotzoneLocalAIURL?.Length > 0)
 				BotzoneProtocol.Credentials.BotzoneCopiedURL = Properties.Settings.Default.LastBotzoneLocalAIURL;
@@ -305,21 +307,9 @@ namespace BotzoneLocalRunner
 		{
 			try
 			{
-				var conf = ViewModel.CurrentConfiguration;
-				var matchID = await BotzoneProtocol.RequestMatch(conf);
-				var match = new BotzoneMatch(conf, matchID);
+				var match = await ViewModel.CurrentConfiguration.CreateMatch();
 				ViewModel.MatchStarted = true;
-				while (true)
-				{
-					while (!await match.FetchNextMatchRequest()) ;
-					if (match.Status == MatchStatus.Finished || match.Status == MatchStatus.Aborted)
-						break;
-					match.MyConf.LogContent += (">>> REQUEST" +
-						Environment.NewLine + match.Runner.Requests.Last() + Environment.NewLine);
-					await match.Runner.RunForResponse();
-					match.MyConf.LogContent += ("<<< RESPONSE" +
-						Environment.NewLine + match.Runner.Responses.Last() + Environment.NewLine);
-				}
+				await match.RunMatch();
 			}
 			catch
 			{
@@ -337,13 +327,10 @@ namespace BotzoneLocalRunner
 				((ScrollViewer)e.OriginalSource).ScrollToEnd();
 		}
 
-		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void List_Loaded(object sender, RoutedEventArgs e)
 		{
-			var tab = sender as TabControl;
-			if (tab == null)
-				return;
-			var item = tab.ItemContainerGenerator.ContainerFromIndex(tab.SelectedIndex) as TabItem;
-			var c = item.Content;
+			var parent = VisualTreeHelper.GetChild(sender as FrameworkElement, 0) as Decorator;
+			(parent?.Child as ScrollViewer).ScrollToEnd();
 		}
 	}
 }

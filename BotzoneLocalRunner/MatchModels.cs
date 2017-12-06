@@ -40,7 +40,7 @@ namespace BotzoneLocalRunner
 		Aborted
 	}
 
-	internal class Match
+	internal abstract class Match
 	{
 		public MatchConfiguration Configuration { get; set; }
 		public List<dynamic> DisplayLogs { get; set; }
@@ -48,7 +48,9 @@ namespace BotzoneLocalRunner
 		public double[] Scores { get; set; }
 		public MatchStatus Status { get; set; }
 
-		public virtual void Finish(bool aborted)
+		public abstract Task RunMatch();
+
+		protected virtual void Finish(bool aborted)
 		{
 			if (aborted)
 				Status = MatchStatus.Aborted;
@@ -82,10 +84,26 @@ namespace BotzoneLocalRunner
 			ActiveMatch = this;
 		}
 
-		public override void Finish(bool aborted)
+		protected override void Finish(bool aborted)
 		{
 			base.Finish(aborted);
 			ActiveMatch = null;
+		}
+
+		public override async Task RunMatch()
+		{
+			MyConf.LogContent = "";
+			while (true)
+			{
+				while (!await this.FetchNextMatchRequest()) ;
+				if (Status == MatchStatus.Finished || Status == MatchStatus.Aborted)
+					break;
+				MyConf.LogContent += (">>> REQUEST" +
+					Environment.NewLine + Runner.Requests.Last() + Environment.NewLine);
+				await Runner.RunForResponse();
+				MyConf.LogContent += ("<<< RESPONSE" +
+					Environment.NewLine + Runner.Responses.Last() + Environment.NewLine);
+			}
 		}
 	}
 }

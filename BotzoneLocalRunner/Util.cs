@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Interactivity;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -151,23 +150,23 @@ namespace BotzoneLocalRunner
 			=> this;
 	}
 
-	public class AppendTextBehavior : Behavior<TextBox>
-	{
-		public Action<string> AppendTextAction
-		{
-			get { return (Action<string>)GetValue(AppendTextActionProperty); }
-			set { SetValue(AppendTextActionProperty, value); }
-		}
+	//public class ScrollToEndBehavior : Behavior<ScrollViewer>
+	//{
+	//	public Action ScrollToEndAction
+	//	{
+	//		get { return (Action)GetValue(ScrollToEndActionProperty); }
+	//		set { SetValue(ScrollToEndActionProperty, value); }
+	//	}
 		
-		public static readonly DependencyProperty AppendTextActionProperty =
-			DependencyProperty.Register("AppendTextAction", typeof(Action<string>), typeof(AppendTextBehavior), new PropertyMetadata(null));
+	//	public static readonly DependencyProperty ScrollToEndActionProperty =
+	//		DependencyProperty.Register("ScrollToEndAction", typeof(Action), typeof(ScrollToEndBehavior), new PropertyMetadata(null));
 
-		protected override void OnAttached()
-		{
-			SetCurrentValue(AppendTextActionProperty, (Action<string>)AssociatedObject.AppendText);
-			base.OnAttached();
-		}
-	}
+	//	protected override void OnAttached()
+	//	{
+	//		SetCurrentValue(ScrollToEndActionProperty, (Action)AssociatedObject.ScrollToEnd);
+	//		base.OnAttached();
+	//	}
+	//}
 	#endregion
 
 	internal static class Util

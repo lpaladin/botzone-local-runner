@@ -3,7 +3,6 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
 		xmlns:cefSharp="clr-namespace:CefSharp.WinForms;assembly=CefSharp.WinForms"
 		xmlns:local="clr-namespace:BotzoneLocalRunner"
 		x:Class="BotzoneLocalRunner.MainWindow"
@@ -59,7 +58,7 @@
 				</Image>
 			</ToolBar>
 		</ToolBarTray>
-		<TabControl Margin="0,3,0,0" Background="Transparent" RenderTransformOrigin="0.5,0.5" Grid.Row="2" Grid.ColumnSpan="2" SelectionChanged="TabControl_SelectionChanged">
+		<TabControl Margin="0,3,0,0" Background="Transparent" RenderTransformOrigin="0.5,0.5" Grid.Row="2" Grid.ColumnSpan="2">
 			<TabControl.ItemContainerStyle>
 				<Style TargetType="{x:Type TabItem}">
 					<Setter Property="IsEnabled" Value="True"/>
@@ -76,10 +75,8 @@
 			<TabControl.ContentTemplate>
 				<DataTemplate DataType="{x:Type local:PlayerConfiguration}">
 					<TextBox x:Name="List" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible"
-							 UndoLimit="0" Text="{Binding LogContent}" ScrollViewer.ScrollChanged="ScrollChangedAndScrollToEnd">
-						<!--<i:Interaction.Behaviors>
-							<local:AppendTextBehavior AppendTextAction="{Binding AppendLogAction, Mode=OneWayToSource}" />
-						</i:Interaction.Behaviors>-->
+							 UndoLimit="0" Text="{Binding LogContent}" ScrollViewer.ScrollChanged="ScrollChangedAndScrollToEnd"
+							 ScrollViewer.Loaded="List_Loaded">
 					</TextBox>
 				</DataTemplate>
 			</TabControl.ContentTemplate>
@@ -100,7 +97,9 @@
 						<TabItem.ContentTemplate>
 							<DataTemplate>
 								<Grid Background="#FFE5E5E5">
-									<ListBox x:Name="List" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding Source={StaticResource ResourceKey=LogSource}}" ScrollViewer.ScrollChanged="ScrollChangedAndScrollToEnd">
+									<ListBox x:Name="List" ScrollViewer.CanContentScroll="True"
+											 ItemsSource="{Binding Source={StaticResource ResourceKey=LogSource}}"
+											 ScrollViewer.ScrollChanged="ScrollChangedAndScrollToEnd" ScrollViewer.Loaded="List_Loaded">
 										<ListBox.ItemTemplate>
 											<DataTemplate>
 												<BulletDecorator>
@@ -120,7 +119,7 @@
 						<TabItem.ContentTemplate>
 							<DataTemplate>
 								<Grid Background="#FFE5E5E5">
-									<ListView x:Name="List">
+									<ListView x:Name="List" ScrollViewer.Loaded="List_Loaded">
 										<ListView.View>
 											<GridView>
 												<GridViewColumn/>
@@ -152,6 +151,7 @@
 			<Grid Width="227" Margin="5">
 				<Grid.Style>
 					<Style>
+						<Setter Property="Grid.IsEnabled" Value="True" />
 						<Style.Triggers>
 							<DataTrigger Binding="{Binding MatchStarted}" Value="True">
 								<Setter Property="Grid.IsEnabled" Value="False" />
