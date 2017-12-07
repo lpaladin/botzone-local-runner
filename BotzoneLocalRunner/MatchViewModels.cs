@@ -149,6 +149,7 @@ namespace BotzoneLocalRunner
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
+	[Serializable]
 	public class MatchConfiguration : ObservableCollection<PlayerConfiguration>, IValidationBubbling
 	{
 		private Game _Game;

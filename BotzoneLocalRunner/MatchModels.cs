@@ -50,7 +50,7 @@ namespace BotzoneLocalRunner
 
 		public abstract Task RunMatch();
 
-		protected virtual void Finish(bool aborted)
+		public virtual void OnFinish(bool aborted)
 		{
 			if (aborted)
 				Status = MatchStatus.Aborted;
@@ -84,9 +84,9 @@ namespace BotzoneLocalRunner
 			ActiveMatch = this;
 		}
 
-		protected override void Finish(bool aborted)
+		public override void OnFinish(bool aborted)
 		{
-			base.Finish(aborted);
+			base.OnFinish(aborted);
 			ActiveMatch = null;
 		}
 

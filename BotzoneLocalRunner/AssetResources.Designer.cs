@@ -171,6 +171,16 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
+        ///   查找类似 $(&quot;#dNavbar, #footer, #btnExpand, #tutorial-trigger&quot;).hide(); 
+        ///$(&quot;body&gt;div.container&quot;).css(&quot;paddingTop&quot;, &quot;inherit&quot;); 的本地化字符串。
+        /// </summary>
+        public static string SimplifyOnlineMatch {
+            get {
+                return ResourceManager.GetString("SimplifyOnlineMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
         public static System.Drawing.Bitmap Warning {
