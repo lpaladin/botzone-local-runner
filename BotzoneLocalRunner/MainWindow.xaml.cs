@@ -13,6 +13,7 @@ using System.Windows.Interop;
 using System.Text.RegularExpressions;
 using static BotzoneLocalRunner.Util;
 using System.Windows.Media;
+using System.Configuration;
 
 namespace BotzoneLocalRunner
 {
@@ -193,6 +194,24 @@ namespace BotzoneLocalRunner
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
+	public class SavedConfiguration : ApplicationSettingsBase
+	{
+		[UserScopedSetting()]
+		[SettingsSerializeAs(System.Configuration.SettingsSerializeAs.Binary)]
+		[DefaultSettingValue("")]
+		public MatchConfiguration Configuration
+		{
+			get
+			{
+				return ((MatchConfiguration)this["Configuration"]);
+			}
+			set
+			{
+				this["Configuration"] = (MatchConfiguration)value;
+			}
+		}
+	}
+
 	/// <summary>
 	/// MainWindow.xaml 的交互逻辑
 	/// </summary>
@@ -234,12 +253,17 @@ namespace BotzoneLocalRunner
 			return IntPtr.Zero;
 		}
 
+		private SavedConfiguration LastConf;
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			ViewModel.CurrentConfiguration = new MatchConfiguration();
+			LastConf = new SavedConfiguration();
+			if (LastConf.Configuration != null)
+				ViewModel.CurrentConfiguration = LastConf.Configuration;
+			else
+				ViewModel.CurrentConfiguration = new MatchConfiguration();
 			BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
 			ViewModel.AllGames = new RangeObservableCollection<Game>(new[] { new Game { Name = "..." } });
 			ViewModel.Logs = new LogCollection();
@@ -263,6 +287,8 @@ namespace BotzoneLocalRunner
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
+			LastConf.Configuration = ViewModel.CurrentConfiguration;
+			LastConf.Save();
 			Cef.Shutdown();
 			NativeMethods.RemoveClipboardFormatListener(hwnd);
 		}

@@ -212,13 +212,13 @@ namespace BotzoneLocalRunner
 				if (parts[2] == "0")
 				{
 					Logger.Log(LogLevel.Warning, $"对局 {match.MatchID} 中止");
-					match.Finish(true);
+					match.OnFinish(true);
 				}
 				else
 				{
 					match.Scores = parts.Skip(3).Select(x => double.Parse(x)).ToArray();
 					Logger.Log(LogLevel.OK, $"对局 {match.MatchID} 结束，比分为 {parts.Skip(3).ToArray()}，本地AI分数 {parts[3 + match.MySlot]}");
-					match.Finish(false);
+					match.OnFinish(false);
 				}
 				return false;
 			}
