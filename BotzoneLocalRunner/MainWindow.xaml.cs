@@ -259,7 +259,6 @@ namespace BotzoneLocalRunner
 						"en"
 					})
 			};
-			WebBrowser.Load("https://www.botzone.org");
 		}
 
 		private void Window_Closing(object sender, CancelEventArgs e)
@@ -308,6 +307,12 @@ namespace BotzoneLocalRunner
 			try
 			{
 				var match = await ViewModel.CurrentConfiguration.CreateMatch();
+				if (match is BotzoneMatch)
+				{
+					WebBrowser.Load(Properties.Settings.Default.BotzoneMatchURLBase + (match as BotzoneMatch).MatchID);
+					WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
+				}
+
 				ViewModel.MatchStarted = true;
 				await match.RunMatch();
 			}
@@ -318,6 +323,15 @@ namespace BotzoneLocalRunner
 			finally
 			{
 				ViewModel.MatchStarted = false;
+			}
+		}
+
+		private void WebBrowser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
+		{
+			if (e.IsLoading == false)
+			{
+				WebBrowser.EvaluateScriptAsync("alert('All Resources Have Loaded');");
+				WebBrowser.LoadingStateChanged -= WebBrowser_LoadingStateChanged;
 			}
 		}
 

@@ -11,5 +11,8 @@
     <Setting Name="LastBotzoneLocalAIURL" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="BotzoneMatchURLBase" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://www.botzone.org/match/</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
