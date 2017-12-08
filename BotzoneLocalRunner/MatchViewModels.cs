@@ -86,7 +86,10 @@ namespace BotzoneLocalRunner
 		private string _LogContent;
 		public string LogContent
 		{
-			get => _LogContent;
+			get
+			{
+				return _LogContent;
+			}
 			set
 			{
 				if (value != _LogContent)

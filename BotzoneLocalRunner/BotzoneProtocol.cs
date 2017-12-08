@@ -217,7 +217,7 @@ namespace BotzoneLocalRunner
 				else
 				{
 					match.Scores = parts.Skip(3).Select(x => double.Parse(x)).ToArray();
-					Logger.Log(LogLevel.OK, $"对局 {match.MatchID} 结束，比分为 {parts.Skip(3).ToArray()}，本地AI分数 {parts[3 + match.MySlot]}");
+					Logger.Log(LogLevel.OK, $"对局 {match.MatchID} 结束，比分为 {string.Join(",", parts.Skip(3))}，本地AI分数 {parts[3 + match.MySlot]}");
 					match.OnFinish(false);
 				}
 				return false;

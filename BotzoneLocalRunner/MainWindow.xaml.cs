@@ -356,7 +356,7 @@ namespace BotzoneLocalRunner
 		{
 			if (e.IsLoading == false)
 			{
-				WebBrowser.EvaluateScriptAsync("alert('All Resources Have Loaded');");
+				WebBrowser.EvaluateScriptAsync(AssetResources.SimplifyOnlineMatch);
 				WebBrowser.LoadingStateChanged -= WebBrowser_LoadingStateChanged;
 			}
 		}
