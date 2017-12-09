@@ -20,6 +20,7 @@ namespace BotzoneLocalRunner
 		BotzoneBot
 	}
 
+	[Serializable]
 	public class Game
 	{
 		public string Name { get; set; }
@@ -255,7 +256,7 @@ namespace BotzoneLocalRunner
 		{
 			IsValid = false;
 			ValidationString = message;
-			ValidationChanged(this, null);
+			ValidationChanged?.Invoke(this, null);
 		}
 
 		public void PlayerConfigurationPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -299,19 +300,19 @@ namespace BotzoneLocalRunner
 				return;
 			}
 			IsValid = true;
-			ValidationChanged(this, null);
+			ValidationChanged?.Invoke(this, null);
 		}
 
 		internal async Task<Match> CreateMatch()
 		{
 			if (!IsLocalMatch)
 			{
-				var matchID = await BotzoneProtocol.RequestMatch(this);
+				var matchID = await this.RequestMatch();
 				return new BotzoneMatch(this, matchID);
 			}
 			else
 			{
-				throw new NotImplementedException();
+				return new LocalMatch(this);
 			}
 		}
 	}

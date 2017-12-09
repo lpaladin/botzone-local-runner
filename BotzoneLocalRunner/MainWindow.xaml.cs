@@ -197,7 +197,7 @@ namespace BotzoneLocalRunner
 	public class SavedConfiguration : ApplicationSettingsBase
 	{
 		[UserScopedSetting()]
-		[SettingsSerializeAs(System.Configuration.SettingsSerializeAs.Binary)]
+		[SettingsSerializeAs(SettingsSerializeAs.Binary)]
 		[DefaultSettingValue("")]
 		public MatchConfiguration Configuration
 		{
@@ -258,6 +258,7 @@ namespace BotzoneLocalRunner
 		public MainWindow()
 		{
 			InitializeComponent();
+			BotzoneProtocol.CurrentBrowser = WebBrowser;
 
 			LastConf = new SavedConfiguration();
 			if (LastConf.Configuration != null)

@@ -46,7 +46,12 @@ namespace BotzoneLocalRunner
 		public List<dynamic> DisplayLogs { get; set; }
 		public List<ILogItem> Logs { get; set; }
 		public double[] Scores { get; set; }
-		public MatchStatus Status { get; set; }
+		public MatchStatus Status { get; set; } = MatchStatus.Waiting;
+
+		protected Match(MatchConfiguration conf)
+		{
+			Configuration = conf;
+		}
 
 		public abstract Task RunMatch();
 
@@ -67,9 +72,8 @@ namespace BotzoneLocalRunner
 		public PlayerConfiguration MyConf { get; }
 		public LocalProgramRunner Runner { get; }
 
-		public BotzoneMatch(MatchConfiguration conf, string matchID)
+		public BotzoneMatch(MatchConfiguration conf, string matchID) : base(conf)
 		{
-			Configuration = conf;
 			MatchID = matchID;
 			for (int i = 0; i < conf.Count; i++)
 				if (conf[i].Type != PlayerType.BotzoneBot)
@@ -87,6 +91,7 @@ namespace BotzoneLocalRunner
 		public override void OnFinish(bool aborted)
 		{
 			base.OnFinish(aborted);
+			this.FetchFullLogs();
 			ActiveMatch = null;
 		}
 

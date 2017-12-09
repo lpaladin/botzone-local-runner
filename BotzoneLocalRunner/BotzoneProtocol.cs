@@ -120,6 +120,42 @@ namespace BotzoneLocalRunner
 		internal BotzoneRequestFailException(int statusCode, string message) : base($"[HTTP {statusCode}] {message}") { }
 	}
 
+	internal class MatchLogConverter : JsonConverter
+	{
+		public override bool CanConvert(Type objectType)
+		{
+			return (objectType == typeof(List<ILogItem>));
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			var obj = JObject.Load(reader);
+			var arr = (JArray)obj["logs"];
+			List<ILogItem> logs = new List<ILogItem>(arr.Count);
+			int i, n = arr.Count;
+			for (i = 0; i < n; i++)
+			{
+				if (i % 2 == 0)
+					// JudgeLog
+					logs.Add(arr[i].ToObject<JudgeLogItem>());
+				else
+					// BotLog
+					logs.Add(arr[i].ToObject<BotLogItem>());
+			}
+			return logs;
+		}
+		
+		public override bool CanWrite
+		{
+			get { return false; }
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
 	internal static class BotzoneProtocol
 	{
 		internal static BotzoneCredentials Credentials { get; set; }
@@ -129,6 +165,7 @@ namespace BotzoneLocalRunner
 		{
 			BaseAddress = new Uri(Properties.Settings.Default.BotzoneAPIBase)
 		};
+		static MatchLogConverter logConverter = new MatchLogConverter();
 
 		/// <summary>
 		/// 检查请求的返回情况并记录
@@ -225,7 +262,7 @@ namespace BotzoneLocalRunner
 			return false;
 		}
 
-		internal static async Task<string> RequestMatch(MatchConfiguration conf)
+		internal static async Task<string> RequestMatch(this MatchConfiguration conf)
 		{
 			if (!conf.IsValid)
 				return null;
@@ -250,6 +287,31 @@ namespace BotzoneLocalRunner
 			return matchID;
 		}
 
+		internal static async void FetchFullLogs(this BotzoneMatch match)
+		{
+			do
+			{
+				Logger.Log(LogLevel.Info, "尝试从 Botzone 读取对局 Log……");
+				try
+				{
+					var str = await client.GetStringAsync(
+						Properties.Settings.Default.BotzoneMatchURLBase + match.MatchID + "?lite=true"
+					);
+					match.Logs = JsonConvert.DeserializeObject<List<ILogItem>>(str, logConverter);
+					match.DisplayLogs = (from item in match.Logs.OfType<JudgeLogItem>()
+										select item.output.display).ToList();
+				}
+				catch (Exception ex)
+				{
+					Logger.Log(LogLevel.Warning, "请求过程中发生错误：" + ex.Message);
+					Logger.Log(LogLevel.InfoTip, "5秒后重试……");
+					await Task.Delay(5000);
+				}
+			} while (match.Logs == null);
+
+			Logger.Log(LogLevel.OK, "对局 Log 加载成功！");
+		}
+
 		internal static async Task<IEnumerable<Game>> GetGames()
 		{
 			JArray raw = null;
@@ -258,8 +320,7 @@ namespace BotzoneLocalRunner
 				Logger.Log(LogLevel.Info, "尝试从 Botzone 读取游戏列表……");
 				try
 				{
-					var res = await client.GetAsync(Properties.Settings.Default.BotzoneGamesPath);
-					var str = await res.Content.ReadAsStringAsync();
+					var str = await client.GetStringAsync(Properties.Settings.Default.BotzoneGamesPath);
 					raw = JArray.Parse(str);
 				}
 				catch (Exception ex)
