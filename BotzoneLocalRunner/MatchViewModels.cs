@@ -19,13 +19,19 @@ namespace BotzoneLocalRunner
 		[Description("Botzone上的AI")]
 		BotzoneBot
 	}
-
-	[Serializable]
+	
 	public class Game
 	{
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public int PlayerCount { get; set; }
+	}
+
+	[Serializable]
+	public class PlainPlayerConfiguration
+	{
+		public PlayerType Type { get; set; }
+		public string ID { get; set; }
 	}
 
 	public class PlayerConfiguration : INotifyPropertyChanged, IDataErrorInfo
@@ -48,7 +54,7 @@ namespace BotzoneLocalRunner
 						ID = StringResources.LOCALAI_PLACEHOLDER;
 					else if (value == PlayerType.BotzoneBot)
 						ID = StringResources.BOTZONEBOT_PLACEHOLDER;
-					NotifyPropertyChanged("Type");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -78,7 +84,7 @@ namespace BotzoneLocalRunner
 							StringResources.LOCALAI_PATH_EMPTY :
 							StringResources.ID_EMPTY;
 					}
-					NotifyPropertyChanged("ID");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -96,7 +102,7 @@ namespace BotzoneLocalRunner
 				if (value != _LogContent)
 				{
 					_LogContent = value;
-					NotifyPropertyChanged("LogContent");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -113,7 +119,7 @@ namespace BotzoneLocalRunner
 				if (value != _IsValid)
 				{
 					_IsValid = value;
-					NotifyPropertyChanged("IsValid");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -130,7 +136,7 @@ namespace BotzoneLocalRunner
 				if (value != _ValidationString)
 				{
 					_ValidationString = value;
-					NotifyPropertyChanged("ValidationString");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -152,8 +158,7 @@ namespace BotzoneLocalRunner
 
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
-
-	[Serializable]
+	
 	public class MatchConfiguration : ObservableCollection<PlayerConfiguration>, IValidationBubbling
 	{
 		private Game _Game;
@@ -310,10 +315,7 @@ namespace BotzoneLocalRunner
 				var matchID = await this.RequestMatch();
 				return new BotzoneMatch(this, matchID);
 			}
-			else
-			{
-				return new LocalMatch(this);
-			}
+			return new LocalMatch(this);
 		}
 	}
 

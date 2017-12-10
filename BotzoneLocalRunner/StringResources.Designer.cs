@@ -19,7 +19,7 @@ namespace BotzoneLocalRunner {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class StringResources {
@@ -129,6 +129,42 @@ namespace BotzoneLocalRunner {
         public static string CHOOSE_GAME_FIRST {
             get {
                 return ResourceManager.GetString("CHOOSE_GAME_FIRST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在加载图形界面…… 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_LOAD_GUI {
+            get {
+                return ResourceManager.GetString("CONSOLE_LOAD_GUI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 欢迎使用 Botzone 本地调试工具。 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_WELCOME {
+            get {
+                return ResourceManager.GetString("CONSOLE_WELCOME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 如果不需要图形界面，请添加命令行参数启动。 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_WELCOME2 {
+            get {
+                return ResourceManager.GetString("CONSOLE_WELCOME2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 -h 参数可以查看命令行参数使用方法。 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_WELCOME3 {
+            get {
+                return ResourceManager.GetString("CONSOLE_WELCOME3", resourceCulture);
             }
         }
         

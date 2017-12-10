@@ -182,7 +182,7 @@
 										<ComboBox x:Name="cmbType"
 											ItemsSource="{Binding Type, Converter={local:EnumToCollectionConverter}, Mode=OneTime}"
 											DisplayMemberPath="Description"
-											SelectedItem="{Binding Type, Converter={local:ValueDescriptionToEnumConverter}}"
+											SelectedItem="{Binding Type, Converter={local:ValueDescriptionToEnumConverter}, Mode=TwoWay}"
 											IsSynchronizedWithCurrentItem="True"
 											Grid.ColumnSpan="2"/>
 										<Button x:Name="btnSelect" Content="选择..." Tag="{Binding}" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" Click="btnSelect_Click"/>

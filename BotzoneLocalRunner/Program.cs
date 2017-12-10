@@ -24,16 +24,16 @@ namespace BotzoneLocalRunner
 		public static void Main()
 		{
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("欢迎使用 Botzone 本地调试工具。");
-			Console.WriteLine("如果不需要图形界面，请添加命令行参数启动。");
-			Console.WriteLine("-h 参数可以查看命令行参数使用方法。");
+			Console.WriteLine(StringResources.CONSOLE_WELCOME);
+			Console.WriteLine(StringResources.CONSOLE_WELCOME2);
+			Console.WriteLine(StringResources.CONSOLE_WELCOME3);
 			var args = Environment.GetCommandLineArgs();
 			if (args.Length > 1)
 				new Program().ConsoleMain(args);
 			else
 			{
 				Console.ForegroundColor = ConsoleColor.Gray;
-				Console.WriteLine("正在加载图形界面……");
+				Console.WriteLine(StringResources.CONSOLE_LOAD_GUI);
 				FreeConsole();
 				App.Main();
 			}

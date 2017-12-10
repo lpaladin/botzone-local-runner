@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using static BotzoneLocalRunner.Util;
 using System.Windows.Media;
 using System.Configuration;
+using System.Threading.Tasks;
 
 namespace BotzoneLocalRunner
 {
@@ -196,18 +197,18 @@ namespace BotzoneLocalRunner
 
 	public class SavedConfiguration : ApplicationSettingsBase
 	{
-		[UserScopedSetting()]
+		[UserScopedSetting]
 		[SettingsSerializeAs(SettingsSerializeAs.Binary)]
 		[DefaultSettingValue("")]
-		public MatchConfiguration Configuration
+		public PlainPlayerConfiguration[] Configuration
 		{
 			get
 			{
-				return ((MatchConfiguration)this["Configuration"]);
+				return (PlainPlayerConfiguration[])this["Configuration"];
 			}
 			set
 			{
-				this["Configuration"] = (MatchConfiguration)value;
+				this["Configuration"] = value;
 			}
 		}
 	}
@@ -261,10 +262,7 @@ namespace BotzoneLocalRunner
 			BotzoneProtocol.CurrentBrowser = WebBrowser;
 
 			LastConf = new SavedConfiguration();
-			if (LastConf.Configuration != null)
-				ViewModel.CurrentConfiguration = LastConf.Configuration;
-			else
-				ViewModel.CurrentConfiguration = new MatchConfiguration();
+			ViewModel.CurrentConfiguration = new MatchConfiguration();
 			BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
 			ViewModel.AllGames = new RangeObservableCollection<Game>(new[] { new Game { Name = "..." } });
 			ViewModel.Logs = new LogCollection();
@@ -276,19 +274,23 @@ namespace BotzoneLocalRunner
 			WebBrowser.BrowserSettings = new BrowserSettings
 			{
 				AcceptLanguageList =
-					String.Join(",", new[]
-					{
-						CultureInfo.CurrentCulture.Name,
-						CultureInfo.CurrentCulture.TwoLetterISOLanguageName,
-						"en-US",
-						"en"
-					})
+					String.Join(",", CultureInfo.CurrentCulture.Name, CultureInfo.CurrentCulture.TwoLetterISOLanguageName, "en-US", "en")
 			};
 		}
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-			LastConf.Configuration = ViewModel.CurrentConfiguration;
+			if (ViewModel.CurrentConfiguration.Game != null)
+			{
+				Properties.Settings.Default.LastSelectedGame = ViewModel.CurrentConfiguration.Game.Name;
+				LastConf.Configuration = (from player in ViewModel.CurrentConfiguration
+					select new PlainPlayerConfiguration
+					{
+						ID = player.ID,
+						Type = player.Type
+					}).ToArray();
+			}
+			Properties.Settings.Default.Save();
 			LastConf.Save();
 			Cef.Shutdown();
 			NativeMethods.RemoveClipboardFormatListener(hwnd);
@@ -300,6 +302,21 @@ namespace BotzoneLocalRunner
 			ViewModel.AllGames.RemoveAt(0);
 			ViewModel.AllGames.AddRange(games);
 			ViewModel.GamesLoaded = true;
+			var lastGame = Properties.Settings.Default.LastSelectedGame;
+			if (lastGame?.Length > 0)
+			{
+				ViewModel.CurrentConfiguration.Game = ViewModel.AllGames.First(x => x.Name == lastGame);
+
+				// Dirty hack……设置Game后，绑定了Type的ComboBox会在下一时刻更新Type，并覆盖掉这里的初值……
+				// 所以要等一时刻
+				await Task.Delay(500);
+				if (LastConf.Configuration?.Length > 0)
+					for (int i = 0; i < LastConf.Configuration.Length; i++)
+					{
+						ViewModel.CurrentConfiguration[i].Type = LastConf.Configuration[i].Type;
+						ViewModel.CurrentConfiguration[i].ID = LastConf.Configuration[i].ID;
+					}
+			}
 		}
 
 		private void btnSelect_Click(object sender, RoutedEventArgs e)
@@ -322,7 +339,7 @@ namespace BotzoneLocalRunner
 		private void txtLocalAIURL_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
 		{
 			var s = (sender as TextBox);
-			if (s.IsReadOnly)
+			if (s?.IsReadOnly == true)
 				return;
 
 			s.Focus();
@@ -371,7 +388,7 @@ namespace BotzoneLocalRunner
 		private void List_Loaded(object sender, RoutedEventArgs e)
 		{
 			var parent = VisualTreeHelper.GetChild(sender as FrameworkElement, 0) as Decorator;
-			(parent?.Child as ScrollViewer).ScrollToEnd();
+			(parent?.Child as ScrollViewer)?.ScrollToEnd();
 		}
 	}
 }

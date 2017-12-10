@@ -165,4 +165,16 @@
   <data name="TOO_MANY_HUMAN" xml:space="preserve">
     <value>人类玩家最多只能有一个</value>
   </data>
+  <data name="CONSOLE_WELCOME" xml:space="preserve">
+    <value>欢迎使用 Botzone 本地调试工具。</value>
+  </data>
+  <data name="CONSOLE_WELCOME2" xml:space="preserve">
+    <value>如果不需要图形界面，请添加命令行参数启动。</value>
+  </data>
+  <data name="CONSOLE_WELCOME3" xml:space="preserve">
+    <value>-h 参数可以查看命令行参数使用方法。</value>
+  </data>
+  <data name="CONSOLE_LOAD_GUI" xml:space="preserve">
+    <value>正在加载图形界面……</value>
+  </data>
 </root>

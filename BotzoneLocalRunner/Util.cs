@@ -29,11 +29,11 @@ namespace BotzoneLocalRunner
 	public class InverseBooleanToVisibilityConverter : MarkupExtension, IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter,
-			System.Globalization.CultureInfo culture)
+			CultureInfo culture)
 			=> (bool)value ? Visibility.Collapsed : Visibility.Visible;
 
 		public object ConvertBack(object value, Type targetType, object parameter,
-			System.Globalization.CultureInfo culture)
+			CultureInfo culture)
 			=> null;
 		public override object ProvideValue(IServiceProvider serviceProvider)
 			=> this;
@@ -41,7 +41,7 @@ namespace BotzoneLocalRunner
 
 	public class RangeObservableCollection<T> : ObservableCollection<T>
 	{
-		public RangeObservableCollection() : base() { }
+		public RangeObservableCollection() { }
 		public RangeObservableCollection(List<T> list) : base(list) { }
 		public RangeObservableCollection(IEnumerable<T> collection) : base(collection) { }
 
@@ -56,7 +56,7 @@ namespace BotzoneLocalRunner
 		public void AddRange(IEnumerable<T> list)
 		{
 			if (list == null)
-				throw new ArgumentNullException("list");
+				throw new ArgumentNullException(nameof(list));
 
 			_suppressNotification = true;
 
@@ -74,13 +74,17 @@ namespace BotzoneLocalRunner
 		public Enum Value { get; set; }
 		public string Description { get; set; }
 		public static implicit operator Enum(ValueDescription me) => me.Value;
+
+		public override bool Equals(object obj) => Value.Equals((obj as ValueDescription)?.Value);
+
+		public override int GetHashCode() => Value?.GetHashCode() ?? 0;
 	}
 
 	[ValueConversion(typeof(ValueDescription), typeof(Enum))]
 	public class ValueDescriptionToEnumConverter : MarkupExtension, IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-			=> new ValueDescription { Value = (Enum)value, Description = (value as Enum).Description() };
+			=> new ValueDescription { Value = (Enum)value, Description = ((Enum) value).Description() };
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 			=> (value as ValueDescription)?.Value;

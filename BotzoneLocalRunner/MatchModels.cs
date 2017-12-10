@@ -64,7 +64,7 @@ namespace BotzoneLocalRunner
 		}
 	}
 
-	internal partial class BotzoneMatch : Match
+	internal class BotzoneMatch : Match
 	{
 		public static BotzoneMatch ActiveMatch;
 		public int MySlot { get; }

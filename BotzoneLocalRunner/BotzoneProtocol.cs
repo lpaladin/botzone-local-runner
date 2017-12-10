@@ -40,7 +40,7 @@ namespace BotzoneLocalRunner
 					{
 						IsValid = false;
 						ValidationString = StringResources.BAD_LOCALAI_URL;
-						ValidationChanged(this, null);
+						ValidationChanged?.Invoke(this, null);
 					}
 					else
 					{
@@ -48,11 +48,10 @@ namespace BotzoneLocalRunner
 						Secret = m[0].Groups[2].Value;
 						IsValid = true;
 						Properties.Settings.Default.LastBotzoneLocalAIURL = value;
-						Properties.Settings.Default.Save();
-						ValidationChanged(this, null);
+						ValidationChanged?.Invoke(this, null);
 					}
 
-					NotifyPropertyChanged("BotzoneCopiedURL");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -72,7 +71,7 @@ namespace BotzoneLocalRunner
 				if (value != _IsValid)
 				{
 					_IsValid = value;
-					NotifyPropertyChanged("IsValid");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -90,7 +89,7 @@ namespace BotzoneLocalRunner
 				if (value != _ValidationString)
 				{
 					_ValidationString = value;
-					NotifyPropertyChanged("ValidationString");
+					NotifyPropertyChanged();
 				}
 			}
 		}
@@ -170,7 +169,8 @@ namespace BotzoneLocalRunner
 		/// <summary>
 		/// 检查请求的返回情况并记录
 		/// </summary>
-		/// <param name="res">请求的返回消息</param>
+		/// <param name="res">请求的返回体</param>
+		/// <param name="message">请求返回的消息内容</param>
 		/// <returns>是否成功</returns>
 		/// <exception cref="BotzoneRequestFailException"></exception>
 		private static bool CheckResponse(HttpResponseMessage res, string message)
@@ -253,7 +253,7 @@ namespace BotzoneLocalRunner
 				}
 				else
 				{
-					match.Scores = parts.Skip(3).Select(x => double.Parse(x)).ToArray();
+					match.Scores = parts.Skip(3).Select(double.Parse).ToArray();
 					Logger.Log(LogLevel.OK, $"对局 {match.MatchID} 结束，比分为 {string.Join(",", parts.Skip(3))}，本地AI分数 {parts[3 + match.MySlot]}");
 					match.OnFinish(false);
 				}
