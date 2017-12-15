@@ -227,6 +227,7 @@ namespace BotzoneLocalRunner
 
 
 		private string _ValidationString = StringResources.CHOOSE_GAME_FIRST;
+
 		public string ValidationString
 		{
 			get
@@ -242,6 +243,8 @@ namespace BotzoneLocalRunner
 				}
 			}
 		}
+
+		public string Initdata { get; set; } = "";
 
 		public event EventHandler ValidationChanged;
 

@@ -16,6 +16,7 @@ namespace BotzoneLocalRunner
 		public string command;
 		public dynamic display;
 		public Dictionary<string, dynamic> content;
+		public string initdata;
 	}
 
 	internal class ProgramLogItem
@@ -45,12 +46,14 @@ namespace BotzoneLocalRunner
 		public MatchConfiguration Configuration { get; set; }
 		public List<dynamic> DisplayLogs { get; set; }
 		public List<ILogItem> Logs { get; set; }
+		public string Initdata { get; set; } = "";
 		public double[] Scores { get; set; }
 		public MatchStatus Status { get; set; } = MatchStatus.Waiting;
 
 		protected Match(MatchConfiguration conf)
 		{
 			Configuration = conf;
+			Initdata = conf.Initdata;
 		}
 
 		public abstract Task RunMatch();

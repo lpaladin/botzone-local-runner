@@ -12,12 +12,26 @@ namespace BotzoneLocalRunner
 	internal class LocalProgramRunner
 	{
 		public string ProgramPath { get; set; }
-		public List<string> Requests { get; set; } = new List<string>();
-		public List<string> Responses { get; set; } = new List<string>();
+		public List<dynamic> Requests { get; set; } = new List<dynamic>();
+		public List<dynamic> Responses { get; set; } = new List<dynamic>();
+		public dynamic Data { get; set; }
+		public dynamic GlobalData { get; set; }
 
-		public Task RunForResponse()
+		// 暂时先不考虑本地程序不是简单IO的情况
+		public bool IsSimpleIO { get; set; } = true;
+
+		/// <summary>
+		/// 运行程序，并返回程序运行时间
+		/// </summary>
+		/// <returns>程序运行了多少毫秒</returns>
+		public async Task<int> RunForResponse()
 		{
 			var p = RunProgram();
+			p.EnableRaisingEvents = true;
+
+			var tcsExited = new TaskCompletionSource<object>();
+			var tcsTimeout = new TaskCompletionSource<object>();
+			p.Exited += (sender, e) => tcsExited.SetResult(null);
 			p.StandardInput.WriteLine(Requests.Count);
 			for (int i = 0; i < Responses.Count; i++)
 			{
@@ -26,14 +40,23 @@ namespace BotzoneLocalRunner
 			}
 			p.StandardInput.WriteLine(Requests.Last());
 			p.StandardInput.Close();
-
-			var t = new Task(() =>
+			
+			using (CancellationTokenSource cts = new CancellationTokenSource())
 			{
-				p.WaitForExit();
-				Responses.Add(p.StandardOutput.ReadLine());
-			});
-			t.Start();
-			return t;
+				Task exitedTask = tcsExited.Task;
+				Task completedTask;
+				using (cts.Token.Register(o => ((TaskCompletionSource<object>)o).SetResult(false), tcsTimeout))
+				{
+					cts.CancelAfter(Properties.Settings.Default.HardTimeout);
+					completedTask = await Task.WhenAny(exitedTask, tcsTimeout.Task);
+				}
+				
+				if (completedTask != exitedTask)
+					throw new TimeoutException();
+				await exitedTask;
+			}
+			Responses.Add(p.StandardOutput.ReadLine());
+			return (int)p.TotalProcessorTime.TotalMilliseconds;
 		}
 
 		internal Process RunProgram()

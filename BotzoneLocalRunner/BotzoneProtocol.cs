@@ -272,6 +272,7 @@ namespace BotzoneLocalRunner
 				Logger.Log(LogLevel.Info, "尝试向 Botzone 发起对局请求……");
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneRunMatchURL());
 				req.Headers.Add("X-Game", conf.Game.Name);
+				req.Headers.Add("X-Initdata", conf.Initdata);
 				for (int i = 0; i < conf.Count; i++)
 					req.Headers.Add("X-Player-" + i, conf[i].Type == PlayerType.BotzoneBot ? conf[i].ID : "me");
 				var res = await client.SendAsync(req);
