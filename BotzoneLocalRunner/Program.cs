@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CefSharp;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,6 +29,11 @@ namespace BotzoneLocalRunner
 			Console.WriteLine(StringResources.CONSOLE_WELCOME);
 			Console.WriteLine(StringResources.CONSOLE_WELCOME2);
 			Console.WriteLine(StringResources.CONSOLE_WELCOME3);
+			Cef.Initialize(new CefSettings
+			{
+				Locale = CultureInfo.CurrentCulture.Name
+			});
+
 			var args = Environment.GetCommandLineArgs();
 			if (args.Length > 1)
 				new Program().ConsoleMain(args);
@@ -44,6 +51,9 @@ namespace BotzoneLocalRunner
 		/// </summary>
 		private void ConsoleMain(string[] args)
 		{
+			BotzoneProtocol.CurrentBrowser = new CefSharp.OffScreen.ChromiumWebBrowser();
+			BrowserJSObject.Init();
+
 			Logger = new ConsoleLogger();
 			Logger.Log(LogLevel.Info, "测试纯命令行");
 			var str = Console.ReadLine();

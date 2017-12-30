@@ -17,7 +17,7 @@
     <Setting Name="LastSelectedGame" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="HardTimeout" Type="System.TimeSpan" Scope="User">
+    <Setting Name="TimeLimit" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:10</Value>
     </Setting>
   </Settings>

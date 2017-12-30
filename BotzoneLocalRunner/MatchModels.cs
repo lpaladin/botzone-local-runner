@@ -24,6 +24,8 @@ namespace BotzoneLocalRunner
 		public int time;
 		public int memory;
 		public string verdict;
+		public string raw;
+		public string debug;
 		public JudgeOutput output;
 		public dynamic response;
 	}
@@ -31,7 +33,7 @@ namespace BotzoneLocalRunner
 	internal class BotLogItem : Dictionary<string, ProgramLogItem>, ILogItem { }
 	internal class JudgeLogItem : ProgramLogItem, ILogItem { }
 
-	internal interface ILogItem { }
+	public interface ILogItem { }
 
 	internal enum MatchStatus
 	{
@@ -41,10 +43,12 @@ namespace BotzoneLocalRunner
 		Aborted
 	}
 
-	internal abstract class Match
+	public abstract class Match
 	{
 		public MatchConfiguration Configuration { get; set; }
 		public List<dynamic> DisplayLogs { get; set; }
+		public DateTime BeginTime { get; set; }
+		public DateTime EndTime { get; set; }
 		public List<ILogItem> Logs { get; set; }
 		public string Initdata { get; set; } = "";
 		public double[] Scores { get; set; }
@@ -67,7 +71,7 @@ namespace BotzoneLocalRunner
 		}
 	}
 
-	internal class BotzoneMatch : Match
+	public class BotzoneMatch : Match
 	{
 		public static BotzoneMatch ActiveMatch;
 		public int MySlot { get; }

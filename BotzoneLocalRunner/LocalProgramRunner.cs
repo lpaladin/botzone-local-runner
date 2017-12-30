@@ -6,10 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BotzoneLocalRunner
 {
-	internal class LocalProgramRunner
+	internal class RuntimeException : Exception
+	{
+		internal RuntimeException(string output) : base(output) { }
+	}
+
+	public class LocalProgramRunner
 	{
 		public string ProgramPath { get; set; }
 		public List<dynamic> Requests { get; set; } = new List<dynamic>();
@@ -21,10 +27,10 @@ namespace BotzoneLocalRunner
 		public bool IsSimpleIO { get; set; } = true;
 
 		/// <summary>
-		/// 运行程序，并返回程序运行时间
+		/// 运行程序，直到得到反馈
 		/// </summary>
-		/// <returns>程序运行了多少毫秒</returns>
-		public async Task<int> RunForResponse()
+		/// <returns>程序运行状况</returns>
+		public async Task<ProgramLogItem> RunForResponse()
 		{
 			var p = RunProgram();
 			p.EnableRaisingEvents = true;
@@ -32,22 +38,42 @@ namespace BotzoneLocalRunner
 			var tcsExited = new TaskCompletionSource<object>();
 			var tcsTimeout = new TaskCompletionSource<object>();
 			p.Exited += (sender, e) => tcsExited.SetResult(null);
-			p.StandardInput.WriteLine(Requests.Count);
-			for (int i = 0; i < Responses.Count; i++)
+
+			if (IsSimpleIO)
 			{
-				p.StandardInput.WriteLine(Requests[i]);
-				p.StandardInput.WriteLine(Responses[i]);
+				p.StandardInput.WriteLine(Requests.Count);
+				for (int i = 0; i < Responses.Count; i++)
+				{
+					p.StandardInput.WriteLine(Requests[i].Trim());
+					p.StandardInput.WriteLine(Responses[i].Trim());
+				}
+				p.StandardInput.WriteLine(Requests.Last().Trim());
+				p.StandardInput.WriteLine(Data ?? "");
+				p.StandardInput.WriteLine(GlobalData ?? "");
+				p.StandardInput.Close();
 			}
-			p.StandardInput.WriteLine(Requests.Last());
-			p.StandardInput.Close();
+			else
+			{
+				p.StandardInput.WriteLine(JsonConvert.SerializeObject(new
+				{
+					request = Requests,
+					responses = Responses,
+					data = Data,
+					globaldata = GlobalData,
+					time_limit = Properties.Settings.Default.TimeLimit.TotalMilliseconds,
+					memory_limit = 256
+				}));
+				p.StandardInput.Close();
+			}
 			
+			// 超时处理
 			using (CancellationTokenSource cts = new CancellationTokenSource())
 			{
 				Task exitedTask = tcsExited.Task;
 				Task completedTask;
 				using (cts.Token.Register(o => ((TaskCompletionSource<object>)o).SetResult(false), tcsTimeout))
 				{
-					cts.CancelAfter(Properties.Settings.Default.HardTimeout);
+					cts.CancelAfter(Properties.Settings.Default.TimeLimit);
 					completedTask = await Task.WhenAny(exitedTask, tcsTimeout.Task);
 				}
 				
@@ -55,8 +81,42 @@ namespace BotzoneLocalRunner
 					throw new TimeoutException();
 				await exitedTask;
 			}
-			Responses.Add(p.StandardOutput.ReadLine());
-			return (int)p.TotalProcessorTime.TotalMilliseconds;
+
+			if (p.ExitCode != 0)
+				throw new RuntimeException(p.StandardError.ReadToEnd());
+
+			if (IsSimpleIO)
+			{
+				var raw = p.StandardOutput.ReadLine();
+				var debug = p.StandardOutput.ReadLine();
+
+				Data = p.StandardOutput.ReadLine();
+				GlobalData = p.StandardOutput.ReadLine();
+				Responses.Add(raw);
+				return new ProgramLogItem
+				{
+					time = (int)p.TotalProcessorTime.TotalMilliseconds,
+					// memory = (int)(p.PeakWorkingSet64 / 1024 / 1024),
+					raw = raw,
+					debug = debug,
+					verdict = "OK"
+				};
+			}
+			else
+			{
+				dynamic resp = JsonConvert.DeserializeObject(p.StandardOutput.ReadLine());
+				Data = resp.data;
+				GlobalData = resp.globaldata;
+				Responses.Add(resp.response);
+				return new ProgramLogItem
+				{
+					time = (int)p.TotalProcessorTime.TotalMilliseconds,
+					// memory = (int)(p.PeakWorkingSet64 / 1024 / 1024),
+					response = resp.response,
+					debug = resp.debug,
+					verdict = "OK"
+				};
+			}
 		}
 
 		internal Process RunProgram()

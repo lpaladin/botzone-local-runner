@@ -77,12 +77,12 @@ namespace BotzoneLocalRunner.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("00:00:10")]
-        public global::System.TimeSpan HardTimeout {
+        public global::System.TimeSpan TimeLimit {
             get {
-                return ((global::System.TimeSpan)(this["HardTimeout"]));
+                return ((global::System.TimeSpan)(this["TimeLimit"]));
             }
             set {
-                this["HardTimeout"] = value;
+                this["TimeLimit"] = value;
             }
         }
     }

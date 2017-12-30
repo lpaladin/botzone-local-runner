@@ -18,10 +18,6 @@ namespace BotzoneLocalRunner
 		private App()
 		{
 			Cef.EnableHighDPISupport();
-			Cef.Initialize(new CefSettings
-			{
-				Locale = CultureInfo.CurrentCulture.Name
-			});
 		}
 	}
 }

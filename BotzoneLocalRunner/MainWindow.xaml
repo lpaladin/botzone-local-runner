@@ -7,7 +7,7 @@
 		xmlns:local="clr-namespace:BotzoneLocalRunner"
 		x:Class="BotzoneLocalRunner.MainWindow"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="518" Width="850.816" Closing="Window_Closing" Loaded="Window_Loaded">
+		Title="MainWindow" Height="518" Width="1125.816" Closing="Window_Closing" Loaded="Window_Loaded">
 	<Window.DataContext>
 		<local:MainWindowViewModel x:Name="ViewModel" />
 	</Window.DataContext>
@@ -41,6 +41,10 @@
 						<TextBlock  Text="清空对局组"/>
 					</StackPanel>
 				</Button>
+			</ToolBar>
+			<ToolBar VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Background="#00EEF5FD">
+				<TextBlock Text="本地 AI 秒数限制" Margin="0,3,10,3" />
+				<TextBox Margin="0" TextWrapping="Wrap" Text="{Binding TimeLimit, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MouseEnter="txtLocalAIURL_MouseEnter" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch"/>
 			</ToolBar>
 			<ToolBar VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Background="#00EEF5FD" DataContext="{Binding Credentials}">
 				<TextBox x:Name="txtLocalAIURL" Margin="0,0,5,0" TextWrapping="Wrap" Text="{Binding BotzoneCopiedURL, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" VerticalAlignment="Center" HorizontalAlignment="Stretch" MouseEnter="txtLocalAIURL_MouseEnter" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" Style="{DynamicResource ValidationTextBox}"/>
@@ -90,6 +94,7 @@
 			<TabControl.Resources>
 				<CollectionViewSource Source="{Binding CurrentConfiguration}" x:Key="ConfigurationSource" />
 				<CollectionViewSource Source="{Binding Logs}" x:Key="LogSource" />
+				<CollectionViewSource Source="{Binding MatchCollection}" x:Key="MatchCollectionSource" />
 			</TabControl.Resources>
 			<TabControl.ItemsSource>
 				<CompositeCollection>
@@ -119,10 +124,10 @@
 						<TabItem.ContentTemplate>
 							<DataTemplate>
 								<Grid Background="#FFE5E5E5">
-									<ListView x:Name="List" ScrollViewer.Loaded="List_Loaded">
+									<ListView x:Name="List" ScrollViewer.Loaded="List_Loaded" ItemsSource="{Binding Source={StaticResource ResourceKey=MatchCollectionSource}}">
 										<ListView.View>
 											<GridView>
-												<GridViewColumn/>
+												<GridViewColumn Header="开始时间" DisplayMemberBinding=""/>
 											</GridView>
 										</ListView.View>
 									</ListView>

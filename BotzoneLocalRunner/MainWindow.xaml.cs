@@ -31,6 +31,20 @@ namespace BotzoneLocalRunner
 
 	public class MainWindowViewModel : INotifyPropertyChanged
 	{
+		private TimeSpan _TimeLimit;
+		public TimeSpan TimeLimit
+		{
+			get => _TimeLimit;
+			set
+			{
+				if (value != _TimeLimit)
+				{
+					_TimeLimit = value;
+					Properties.Settings.Default.TimeLimit = value;
+					NotifyPropertyChanged("TimeLimit");
+				}
+			}
+		}
 
 		private BotzoneCredentials _Credentials;
 		public BotzoneCredentials Credentials
@@ -154,6 +168,21 @@ namespace BotzoneLocalRunner
 			}
 		}
 
+
+		private ObservableCollection<Match> _MatchCollection;
+		public ObservableCollection<Match> MatchCollection
+		{
+			get => _MatchCollection;
+			set
+			{
+				if (value != _MatchCollection)
+				{
+					_MatchCollection = value;
+					NotifyPropertyChanged("MatchCollection");
+				}
+			}
+		}
+
 		private bool _IsValid = false;
 		public bool IsValid
 		{
@@ -260,7 +289,9 @@ namespace BotzoneLocalRunner
 		{
 			InitializeComponent();
 			BotzoneProtocol.CurrentBrowser = WebBrowser;
+			BrowserJSObject.Init();
 
+			ViewModel.TimeLimit = Properties.Settings.Default.TimeLimit;
 			LastConf = new SavedConfiguration();
 			ViewModel.CurrentConfiguration = new MatchConfiguration();
 			BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
@@ -352,18 +383,17 @@ namespace BotzoneLocalRunner
 			{
 				var match = await ViewModel.CurrentConfiguration.CreateMatch();
 				if (match is BotzoneMatch)
-				{
 					WebBrowser.Load(Properties.Settings.Default.BotzoneMatchURLBase + (match as BotzoneMatch).MatchID);
-					WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
-				}
+
+				WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 
 				ViewModel.MatchStarted = true;
 				await match.RunMatch();
 			}
-			catch
-			{
-				Logger.Log(LogLevel.No, "对局失败");
-			}
+			//catch
+			//{
+			//	Logger.Log(LogLevel.No, "对局失败");
+			//}
 			finally
 			{
 				ViewModel.MatchStarted = false;
