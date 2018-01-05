@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using static BotzoneLocalRunner.Util;
+using System.Runtime.Serialization;
 
 namespace BotzoneLocalRunner
 {
@@ -35,10 +36,15 @@ namespace BotzoneLocalRunner
 			BotzoneProtocol.CurrentBrowser.RegisterJsObject("cSharpNotifier", Instance);
 		}
 	}
+
+	[Serializable]
 	public class LocalMatch : Match
 	{
-		public LocalProgramRunner[] Runners { get; }
-		public IWebBrowser Browser { get; }
+		[NonSerialized]
+		public readonly LocalProgramRunner[] Runners;
+
+		[NonSerialized]
+		public readonly IWebBrowser Browser;
 
 		#region 调用JS方法
 		internal void SendToJudge() =>
@@ -105,11 +111,13 @@ namespace BotzoneLocalRunner
 			if (aborted)
 			{
 				SetStatus("aborted");
+				Status = MatchStatus.Aborted;
 				EmitEvent("match.end");
 			}
 			else
 			{
 				SetStatus("finished");
+				Status = MatchStatus.Finished;
 				EmitEvent("match.end", Scores);
 			}
 		}
@@ -119,11 +127,10 @@ namespace BotzoneLocalRunner
 			Logger.Log(LogLevel.Info, "正在从 Botzone 载入 Judge 程序...");
 			Status = MatchStatus.Waiting;
 			BrowserJSObject.Instance.JudgeTask = new TaskCompletionSource<string>();
-			Browser.Load("http://localhost:15233/localmatch/Reversi");
+			Browser.Load(Properties.Settings.Default.BotzoneLocalMatchURLBase + Configuration.Game.Name);
 
 			for (int i = 0; i < Configuration.Count; i++)
 				SetIsSimpleIO(i, Configuration[i].Type == PlayerType.LocalAI);
-			Browser.ShowDevTools();
 
 			await BrowserJSObject.Instance.JudgeTask.Task;
 
@@ -270,6 +277,20 @@ namespace BotzoneLocalRunner
 				}
 				AddFullLogItem(botItem);
 			}
+		}
+
+		public override void ReplayMatch(IWebBrowser Browser)
+		{
+			BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
+				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
+				$@"
+<script>
+	live = false;
+	initdata = {JsonConvert.ToString(Initdata)};
+	loglist = {JsonConvert.SerializeObject(Logs)};
+</script>
+");
+			Browser.Load(Properties.Settings.Default.BotzoneLocalMatchURLBase + Configuration.Game.Name);
 		}
 	}
 }

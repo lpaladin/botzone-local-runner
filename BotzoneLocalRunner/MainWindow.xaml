@@ -23,19 +23,19 @@
 		</Grid.RowDefinitions>
 		<ToolBarTray Margin="0" IsLocked="True" Grid.ColumnSpan="2">
 			<ToolBar Margin="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Background="#00EEF5FD">
-				<Button x:Name="btnLoad" VerticalAlignment="Center" Margin="0,0,5,0" Style="{DynamicResource ToolbarButton}">
+				<Button x:Name="btnLoad" VerticalAlignment="Center" Margin="0,0,5,0" Style="{DynamicResource ToolbarButton}" Click="btnLoad_Click">
 					<StackPanel Orientation="Horizontal">
 						<Image Height="16" Width="16" Source="{Binding Converter={local:BitmapRGBAToWPFConverter}, Source={x:Static local:AssetResources.Open}}" Margin="0,0,5,0"/>
 						<TextBlock TextWrapping="Wrap" Text="载入对局组"/>
 					</StackPanel>
 				</Button>
-				<Button x:Name="btnSave" VerticalAlignment="Center" Style="{DynamicResource ToolbarButton}">
+				<Button x:Name="btnSave" VerticalAlignment="Center" Style="{DynamicResource ToolbarButton}" Click="btnSave_Click">
 					<StackPanel Orientation="Horizontal">
 						<Image Height="16" Width="16" Source="{Binding Converter={local:BitmapRGBAToWPFConverter}, Source={x:Static local:AssetResources.Save}}" Margin="0,0,5,0"/>
 						<TextBlock  Text="保存对局组"/>
 					</StackPanel>
 				</Button>
-				<Button x:Name="btnClear" VerticalAlignment="Center" Style="{DynamicResource ToolbarButton}" Margin="0">
+				<Button x:Name="btnClear" VerticalAlignment="Center" Style="{DynamicResource ToolbarButton}" Margin="0" Click="btnClear_Click">
 					<StackPanel Orientation="Horizontal">
 						<Image Height="16" Width="16" Source="{Binding Converter={local:BitmapRGBAToWPFConverter}, Source={x:Static local:AssetResources.Delete}}" Margin="0,0,5,0"/>
 						<TextBlock  Text="清空对局组"/>
@@ -124,10 +124,14 @@
 						<TabItem.ContentTemplate>
 							<DataTemplate>
 								<Grid Background="#FFE5E5E5">
-									<ListView x:Name="List" ScrollViewer.Loaded="List_Loaded" ItemsSource="{Binding Source={StaticResource ResourceKey=MatchCollectionSource}}">
+									<ListView x:Name="List" ScrollViewer.Loaded="List_Loaded" ItemsSource="{Binding Source={StaticResource ResourceKey=MatchCollectionSource}}" MouseDoubleClick="List_MouseDoubleClick">
 										<ListView.View>
 											<GridView>
-												<GridViewColumn Header="开始时间" DisplayMemberBinding=""/>
+												<GridViewColumn Header="开始时间" DisplayMemberBinding="{Binding BeginTime}"/>
+												<GridViewColumn Header="结束时间" DisplayMemberBinding="{Binding EndTime}"/>
+												<GridViewColumn Header="游戏" DisplayMemberBinding="{Binding Configuration.Game.Name}"/>
+												<GridViewColumn Header="比分" DisplayMemberBinding="{Binding Scores, Converter={local:ArrayToStringConverter}}"/>
+												<GridViewColumn Header="状态" DisplayMemberBinding="{Binding Status}"/>
 											</GridView>
 										</ListView.View>
 									</ListView>

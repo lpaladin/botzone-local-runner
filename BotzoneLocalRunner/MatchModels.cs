@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CefSharp;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,12 +7,13 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BotzoneLocalRunner
 {
-	internal class JudgeOutput
+	public class JudgeOutput
 	{
 		public string command;
 		public dynamic display;
@@ -19,7 +21,7 @@ namespace BotzoneLocalRunner
 		public string initdata;
 	}
 
-	internal class ProgramLogItem
+	public class ProgramLogItem
 	{
 		public int time;
 		public int memory;
@@ -30,12 +32,12 @@ namespace BotzoneLocalRunner
 		public dynamic response;
 	}
 
-	internal class BotLogItem : Dictionary<string, ProgramLogItem>, ILogItem { }
-	internal class JudgeLogItem : ProgramLogItem, ILogItem { }
+	public class BotLogItem : Dictionary<string, ProgramLogItem>, ILogItem { }
+	public class JudgeLogItem : ProgramLogItem, ILogItem { }
 
 	public interface ILogItem { }
 
-	internal enum MatchStatus
+	public enum MatchStatus
 	{
 		Waiting,
 		Running,
@@ -43,6 +45,50 @@ namespace BotzoneLocalRunner
 		Aborted
 	}
 
+	[Serializable]
+	public partial class MatchConfiguration : ISerializable
+	{
+		[Serializable]
+		public class CompactPlayerConfiguration
+		{
+			public PlayerType Type;
+			public string ID;
+			public string LogContent;
+		}
+
+		protected MatchConfiguration(SerializationInfo info, StreamingContext context)
+		{
+			var conf = info.GetValue("Configuration", 
+				typeof(CompactPlayerConfiguration[])) as CompactPlayerConfiguration[];
+			Game = new Game
+			{
+				Name = info.GetString("Game"),
+				PlayerCount = conf.Length
+			};
+			for (int i = 0; i < conf.Length; i++)
+				Add(new PlayerConfiguration
+				{
+					SlotID = i, // 顺序很重要
+					Type = conf[i].Type,
+					ID = conf[i].ID,
+					LogContent = conf[i].LogContent
+				});
+		}
+
+		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("Game", Game.Name);
+			info.AddValue("Configuration", (from player in this
+											select new CompactPlayerConfiguration
+											{
+												Type = player.Type,
+												ID = player.ID,
+												LogContent = player.LogContent
+											}).ToArray());
+		}
+	}
+
+	[Serializable]
 	public abstract class Match
 	{
 		public MatchConfiguration Configuration { get; set; }
@@ -58,26 +104,35 @@ namespace BotzoneLocalRunner
 		{
 			Configuration = conf;
 			Initdata = conf.Initdata;
+			BeginTime = DateTime.Now;
 		}
 
 		public abstract Task RunMatch();
 
 		public virtual void OnFinish(bool aborted)
 		{
+			EndTime = DateTime.Now;
 			if (aborted)
 				Status = MatchStatus.Aborted;
 			else
 				Status = MatchStatus.Finished;
 		}
+
+		public abstract void ReplayMatch(IWebBrowser Browser);
 	}
 
+	[Serializable]
 	public class BotzoneMatch : Match
 	{
 		public static BotzoneMatch ActiveMatch;
 		public int MySlot { get; }
 		public string MatchID { get; }
-		public PlayerConfiguration MyConf { get; }
-		public LocalProgramRunner Runner { get; }
+
+		[NonSerialized]
+		public readonly PlayerConfiguration MyConf;
+
+		[NonSerialized]
+		public readonly LocalProgramRunner Runner;
 
 		public BotzoneMatch(MatchConfiguration conf, string matchID) : base(conf)
 		{
@@ -116,6 +171,11 @@ namespace BotzoneLocalRunner
 				MyConf.LogContent += ("<<< RESPONSE" +
 					Environment.NewLine + Runner.Responses.Last() + Environment.NewLine);
 			}
+		}
+
+		public override void ReplayMatch(IWebBrowser Browser)
+		{
+			Browser.Load(Properties.Settings.Default.BotzoneMatchURLBase + MatchID);
 		}
 	}
 }

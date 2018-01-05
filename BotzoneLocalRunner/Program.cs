@@ -52,7 +52,6 @@ namespace BotzoneLocalRunner
 		private void ConsoleMain(string[] args)
 		{
 			BotzoneProtocol.CurrentBrowser = new CefSharp.OffScreen.ChromiumWebBrowser();
-			BrowserJSObject.Init();
 
 			Logger = new ConsoleLogger();
 			Logger.Log(LogLevel.Info, "测试纯命令行");

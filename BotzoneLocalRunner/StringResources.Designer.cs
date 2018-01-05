@@ -19,7 +19,7 @@ namespace BotzoneLocalRunner {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class StringResources {
@@ -210,6 +210,51 @@ namespace BotzoneLocalRunner {
         public static string LOCALHUMAN_PLACEHOLDER {
             get {
                 return ResourceManager.GetString("LOCALHUMAN_PLACEHOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 对局正在进行，无法回放过往对局。 的本地化字符串。
+        /// </summary>
+        public static string MATCH_RUNNING_NO_REPLAY {
+            get {
+                return ResourceManager.GetString("MATCH_RUNNING_NO_REPLAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 对局组文件 (*.matches)|*.matches 的本地化字符串。
+        /// </summary>
+        public static string MATCHES_FILTER {
+            get {
+                return ResourceManager.GetString("MATCHES_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 载入对局组 的本地化字符串。
+        /// </summary>
+        public static string MATCHES_OFD_TITLE {
+            get {
+                return ResourceManager.GetString("MATCHES_OFD_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 保存对局组 的本地化字符串。
+        /// </summary>
+        public static string MATCHES_SFD_TITLE {
+            get {
+                return ResourceManager.GetString("MATCHES_SFD_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 提示 的本地化字符串。
+        /// </summary>
+        public static string MESSAGE {
+            get {
+                return ResourceManager.GetString("MESSAGE", resourceCulture);
             }
         }
         

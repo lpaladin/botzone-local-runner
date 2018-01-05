@@ -85,5 +85,14 @@ namespace BotzoneLocalRunner.Properties {
                 this["TimeLimit"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www.botzone.org/localmatch/")]
+        public string BotzoneLocalMatchURLBase {
+            get {
+                return ((string)(this["BotzoneLocalMatchURLBase"]));
+            }
+        }
     }
 }

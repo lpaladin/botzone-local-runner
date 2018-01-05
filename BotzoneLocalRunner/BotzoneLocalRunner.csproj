@@ -140,10 +140,13 @@
     <Compile Include="LocalMatch.cs" />
     <Compile Include="LocalProgramRunner.cs" />
     <Compile Include="Loggers.cs" />
+    <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="MatchModels.cs" />
     <Compile Include="BotzoneProtocol.cs" />
     <Compile Include="MatchViewModels.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RequestHandler.cs" />
+    <Compile Include="ResponseFilter.cs" />
     <Compile Include="StringResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

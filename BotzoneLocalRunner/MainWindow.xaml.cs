@@ -3,7 +3,6 @@ using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
 using System;
@@ -15,6 +14,7 @@ using static BotzoneLocalRunner.Util;
 using System.Windows.Media;
 using System.Configuration;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace BotzoneLocalRunner
 {
@@ -27,201 +27,6 @@ namespace BotzoneLocalRunner
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
-	}
-
-	public class MainWindowViewModel : INotifyPropertyChanged
-	{
-		private TimeSpan _TimeLimit;
-		public TimeSpan TimeLimit
-		{
-			get => _TimeLimit;
-			set
-			{
-				if (value != _TimeLimit)
-				{
-					_TimeLimit = value;
-					Properties.Settings.Default.TimeLimit = value;
-					NotifyPropertyChanged("TimeLimit");
-				}
-			}
-		}
-
-		private BotzoneCredentials _Credentials;
-		public BotzoneCredentials Credentials
-		{
-			get
-			{
-				return _Credentials;
-			}
-			set
-			{
-				if (value != _Credentials)
-				{
-					if (_Credentials != null)
-						_Credentials.ValidationChanged -= UpdateValidation;
-
-					_Credentials = value;
-					_Credentials.ValidationChanged += UpdateValidation;
-					NotifyPropertyChanged("Credentials");
-				}
-			}
-		}
-
-		private MatchConfiguration _CurrentConfiguration;
-		public MatchConfiguration CurrentConfiguration
-		{
-			get
-			{
-				return _CurrentConfiguration;
-			}
-			set
-			{
-				if (value != _CurrentConfiguration)
-				{
-					if (_CurrentConfiguration != null)
-						_CurrentConfiguration.ValidationChanged -= UpdateValidation;
-
-					_CurrentConfiguration = value;
-					_CurrentConfiguration.ValidationChanged += UpdateValidation;
-					NotifyPropertyChanged("CurrentConfiguration");
-				}
-			}
-		}
-
-		private void UpdateValidation(object sender, System.EventArgs e)
-		{
-			if (Credentials?.IsValid == false)
-			{
-				IsValid = false;
-				ValidationString = Credentials.ValidationString;
-				return;
-			}
-			IsValid = CurrentConfiguration.IsValid;
-			ValidationString = CurrentConfiguration.ValidationString;
-		}
-
-		private RangeObservableCollection<Game> _AllGames;
-		public RangeObservableCollection<Game> AllGames
-		{
-			get
-			{
-				return _AllGames;
-			}
-			set
-			{
-				if (value != _AllGames)
-				{
-					_AllGames = value;
-					NotifyPropertyChanged("AllGames");
-				}
-			}
-		}
-
-		private LogCollection _Logs;
-		public LogCollection Logs
-		{
-			get
-			{
-				return _Logs;
-			}
-			set
-			{
-				if (value != _Logs)
-				{
-					_Logs = value;
-					NotifyPropertyChanged("Logs");
-				}
-			}
-		}
-
-		private bool _MatchStarted = false;
-		public bool MatchStarted
-		{
-			get
-			{
-				return _MatchStarted;
-			}
-			set
-			{
-				if (value != _MatchStarted)
-				{
-					_MatchStarted = value;
-					NotifyPropertyChanged("MatchStarted");
-				}
-			}
-		}
-
-		private bool _GamesLoaded = false;
-		public bool GamesLoaded
-		{
-			get
-			{
-				return _GamesLoaded;
-			}
-			set
-			{
-				if (value != _GamesLoaded)
-				{
-					_GamesLoaded = value;
-					NotifyPropertyChanged("GamesLoaded");
-				}
-			}
-		}
-
-
-		private ObservableCollection<Match> _MatchCollection;
-		public ObservableCollection<Match> MatchCollection
-		{
-			get => _MatchCollection;
-			set
-			{
-				if (value != _MatchCollection)
-				{
-					_MatchCollection = value;
-					NotifyPropertyChanged("MatchCollection");
-				}
-			}
-		}
-
-		private bool _IsValid = false;
-		public bool IsValid
-		{
-			get
-			{
-				return _IsValid;
-			}
-			set
-			{
-				if (value != _IsValid)
-				{
-					_IsValid = value;
-					NotifyPropertyChanged("IsValid");
-				}
-			}
-		}
-
-
-		private string _ValidationString = StringResources.BAD_LOCALAI_URL;
-		public string ValidationString
-		{
-			get
-			{
-				return _ValidationString;
-			}
-			set
-			{
-				if (value != _ValidationString)
-				{
-					_ValidationString = value;
-					NotifyPropertyChanged("ValidationString");
-				}
-			}
-		}
-
-		private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
 	public class SavedConfiguration : ApplicationSettingsBase
@@ -250,11 +55,25 @@ namespace BotzoneLocalRunner
 		private const int WM_CLIPBOARDUPDATE = 0x031D;
 		private IntPtr hwnd;
 
-		OpenFileDialog ofd = new OpenFileDialog
+		OpenFileDialog ofdLocalAI = new OpenFileDialog
 		{
 			ValidateNames = true,
 			Title = StringResources.OFD_TITLE,
 			Filter = StringResources.OFD_FILTER
+		};
+
+		SaveFileDialog sfdMatches = new SaveFileDialog
+		{
+			ValidateNames = true,
+			Title = StringResources.MATCHES_SFD_TITLE,
+			Filter = StringResources.MATCHES_FILTER
+		};
+
+		OpenFileDialog ofdMatches = new OpenFileDialog
+		{
+			ValidateNames = true,
+			Title = StringResources.MATCHES_OFD_TITLE,
+			Filter = StringResources.MATCHES_FILTER
 		};
 
 		protected override void OnSourceInitialized(EventArgs e)
@@ -289,8 +108,8 @@ namespace BotzoneLocalRunner
 		{
 			InitializeComponent();
 			BotzoneProtocol.CurrentBrowser = WebBrowser;
-			BrowserJSObject.Init();
 
+			ViewModel.MatchCollection = new ObservableCollection<Match>();
 			ViewModel.TimeLimit = Properties.Settings.Default.TimeLimit;
 			LastConf = new SavedConfiguration();
 			ViewModel.CurrentConfiguration = new MatchConfiguration();
@@ -353,8 +172,8 @@ namespace BotzoneLocalRunner
 		private void btnSelect_Click(object sender, RoutedEventArgs e)
 		{
 			var player = (sender as Button)?.Tag as PlayerConfiguration;
-			if (ofd.ShowDialog(this) == true)
-				player.ID = ofd.FileName;
+			if (ofdLocalAI.ShowDialog(this) == true)
+				player.ID = ofdLocalAI.FileName;
 		}
 
 		private void txtContent_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
@@ -379,24 +198,29 @@ namespace BotzoneLocalRunner
 
 		private async void btnStartMatch_Click(object sender, RoutedEventArgs e)
 		{
+			Match match = null;
 			try
 			{
-				var match = await ViewModel.CurrentConfiguration.CreateMatch();
+				match = await ViewModel.CurrentConfiguration.CreateMatch();
 				if (match is BotzoneMatch)
 					WebBrowser.Load(Properties.Settings.Default.BotzoneMatchURLBase + (match as BotzoneMatch).MatchID);
 
 				WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 
 				ViewModel.MatchStarted = true;
+
 				await match.RunMatch();
 			}
-			//catch
-			//{
-			//	Logger.Log(LogLevel.No, "对局失败");
-			//}
+			catch
+			{
+				Logger.Log(LogLevel.No, "对局失败");
+				if (match != null)
+					match.Status = MatchStatus.Aborted;
+			}
 			finally
 			{
 				ViewModel.MatchStarted = false;
+				ViewModel.MatchCollection.Add(match);
 			}
 		}
 
@@ -419,6 +243,55 @@ namespace BotzoneLocalRunner
 		{
 			var parent = VisualTreeHelper.GetChild(sender as FrameworkElement, 0) as Decorator;
 			(parent?.Child as ScrollViewer)?.ScrollToEnd();
+		}
+
+		private void btnClear_Click(object sender, RoutedEventArgs e)
+		{
+			ViewModel.MatchCollection.Clear();
+		}
+
+		private void btnSave_Click(object sender, RoutedEventArgs e)
+		{
+			if (sfdMatches.ShowDialog(this) == true)
+			{
+				using (var s = sfdMatches.OpenFile())
+				{
+					var f = new BinaryFormatter();
+					f.Serialize(s, ViewModel.MatchCollection.ToArray());
+				}
+			}
+		}
+
+		private void btnLoad_Click(object sender, RoutedEventArgs e)
+		{
+			if (ofdMatches.ShowDialog(this) == true)
+			{
+				using (var s = ofdMatches.OpenFile())
+				{
+					var f = new BinaryFormatter();
+					var collection = f.Deserialize(s) as Match[];
+					if (collection != null)
+						ViewModel.MatchCollection = new ObservableCollection<Match>(collection);
+				}
+			}
+		}
+
+		private void List_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			if (ViewModel.MatchStarted)
+			{
+				MessageBox.Show(this, StringResources.MATCH_RUNNING_NO_REPLAY, StringResources.MESSAGE,
+					MessageBoxButton.OK, MessageBoxImage.Exclamation);
+				return;
+			}
+			var list = sender as ListView;
+			var match = list.SelectedItem as Match;
+			if (match != null)
+			{
+				match.Configuration.Game = ViewModel.AllGames.First(g => g.Name == match.Configuration.Game.Name);
+				ViewModel.CurrentConfiguration = match.Configuration;
+				match.ReplayMatch(WebBrowser);
+			}
 		}
 	}
 }

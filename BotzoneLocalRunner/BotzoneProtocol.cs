@@ -158,7 +158,24 @@ namespace BotzoneLocalRunner
 	internal static class BotzoneProtocol
 	{
 		internal static BotzoneCredentials Credentials { get; set; }
-		internal static IWebBrowser CurrentBrowser { get; set; }
+
+		private static IWebBrowser _CurrentBrowser;
+		internal static IWebBrowser CurrentBrowser
+		{
+			get
+			{
+				return _CurrentBrowser;
+			}
+			set
+			{
+				if (value != _CurrentBrowser)
+				{
+					_CurrentBrowser = value;
+					_CurrentBrowser.RequestHandler = new BotzoneCefRequestHandler();
+					BrowserJSObject.Init();
+				}
+			}
+		}
 
 		static HttpClient client = new HttpClient
 		{
@@ -273,6 +290,7 @@ namespace BotzoneLocalRunner
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneRunMatchURL());
 				req.Headers.Add("X-Game", conf.Game.Name);
 				req.Headers.Add("X-Initdata", conf.Initdata);
+				req.Headers.Add("X-Timelimit", Properties.Settings.Default.TimeLimit.TotalSeconds.ToString());
 				for (int i = 0; i < conf.Count; i++)
 					req.Headers.Add("X-Player-" + i, conf[i].Type == PlayerType.BotzoneBot ? conf[i].ID : "me");
 				var res = await client.SendAsync(req);

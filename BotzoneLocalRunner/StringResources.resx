@@ -177,4 +177,19 @@
   <data name="CONSOLE_LOAD_GUI" xml:space="preserve">
     <value>正在加载图形界面……</value>
   </data>
+  <data name="MATCHES_FILTER" xml:space="preserve">
+    <value>对局组文件 (*.matches)|*.matches</value>
+  </data>
+  <data name="MATCHES_OFD_TITLE" xml:space="preserve">
+    <value>载入对局组</value>
+  </data>
+  <data name="MATCHES_SFD_TITLE" xml:space="preserve">
+    <value>保存对局组</value>
+  </data>
+  <data name="MATCH_RUNNING_NO_REPLAY" xml:space="preserve">
+    <value>对局正在进行，无法回放过往对局。</value>
+  </data>
+  <data name="MESSAGE" xml:space="preserve">
+    <value>提示</value>
+  </data>
 </root>

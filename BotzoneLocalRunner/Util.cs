@@ -25,6 +25,19 @@ namespace BotzoneLocalRunner
     }
 
 	#region MVVM数据绑定辅助
+	[ValueConversion(typeof(double[]), typeof(string))]
+	public class ArrayToStringConverter : MarkupExtension, IValueConverter
+	{
+
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			=> String.Join(", ", (double[])value);
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			=> null;
+		public override object ProvideValue(IServiceProvider serviceProvider)
+			=> this;
+	}
+
 	[ValueConversion(typeof(bool), typeof(Visibility))]
 	public class InverseBooleanToVisibilityConverter : MarkupExtension, IValueConverter
 	{
