@@ -7,7 +7,8 @@
 		xmlns:local="clr-namespace:BotzoneLocalRunner"
 		x:Class="BotzoneLocalRunner.MainWindow"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="518" Width="1125.816" Closing="Window_Closing" Loaded="Window_Loaded">
+		Title="MainWindow" Height="518" Width="1125.816"
+		Closing="Window_Closing" Loaded="Window_Loaded">
 	<Window.DataContext>
 		<local:MainWindowViewModel x:Name="ViewModel" />
 	</Window.DataContext>
@@ -158,23 +159,37 @@
 				</TextBlock>
 			</Expander.Header>
 			<Grid Width="227" Margin="5">
-				<Grid.Style>
-					<Style>
-						<Setter Property="Grid.IsEnabled" Value="True" />
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding MatchStarted}" Value="True">
-								<Setter Property="Grid.IsEnabled" Value="False" />
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</Grid.Style>
 				<BulletDecorator Height="21" VerticalAlignment="Top">
 					<BulletDecorator.Bullet>
 						<Label Content="游戏" Margin="0,0,0,0" Padding="5,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
 					</BulletDecorator.Bullet>
-					<ComboBox Margin="0,0,0,0" IsEnabled="{Binding GamesLoaded}" SelectedIndex="0" ItemsSource="{Binding AllGames}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentConfiguration.Game}" IsSynchronizedWithCurrentItem="True"/>
+					<ComboBox Margin="0,0,0,0"
+							  SelectedIndex="0" ItemsSource="{Binding AllGames}" 
+							  DisplayMemberPath="Name" SelectedItem="{Binding CurrentConfiguration.Game}" 
+							  IsSynchronizedWithCurrentItem="True">
+						<ComboBox.Style>
+							<Style>
+								<Setter Property="ComboBox.IsEnabled" Value="{Binding GamesLoaded}" />
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding MatchStarted}" Value="True">
+										<Setter Property="ComboBox.IsEnabled" Value="False" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ComboBox.Style>
+					</ComboBox>
 				</BulletDecorator>
 				<GroupBox Header="玩家配备" Margin="0,26,0,45">
+					<GroupBox.Style>
+						<Style>
+							<Setter Property="GroupBox.IsEnabled" Value="True" />
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding MatchStarted}" Value="True">
+									<Setter Property="GroupBox.IsEnabled" Value="False" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</GroupBox.Style>
 					<ScrollViewer VerticalScrollBarVisibility="Auto">
 						<ItemsControl ItemsSource="{Binding CurrentConfiguration}" ScrollViewer.CanContentScroll="True">
 							<ItemsControl.ItemTemplate>
@@ -226,6 +241,32 @@
 						<Image Height="16" Width="16" Source="{Binding Converter={local:BitmapRGBAToWPFConverter}, Source={x:Static local:AssetResources.Run}}" Margin="0,0,5,0"/>
 						<TextBlock Text="开始对局"/>
 					</StackPanel>
+					<Button.Style>
+						<Style>
+							<Setter Property="Button.Visibility" Value="Visible" />
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding MatchStarted}" Value="True">
+									<Setter Property="Button.Visibility" Value="Collapsed"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Button.Style>
+				</Button>
+				<Button x:Name="btnAbortMatch" VerticalAlignment="Bottom" Margin="0" Click="btnAbortMatch_Click">
+					<StackPanel Orientation="Horizontal">
+						<Image Height="16" Width="16" Source="{Binding Converter={local:BitmapRGBAToWPFConverter}, Source={x:Static local:AssetResources.Deny}}" Margin="0,0,5,0"/>
+						<TextBlock Text="中止对局"/>
+					</StackPanel>
+					<Button.Style>
+						<Style>
+							<Setter Property="Button.Visibility" Value="Collapsed" />
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding MatchStarted}" Value="True">
+									<Setter Property="Button.Visibility" Value="Visible"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Button.Style>
 				</Button>
 				<TextBlock Margin="10,0,10,25" TextWrapping="Wrap" Height="15" VerticalAlignment="Bottom" HorizontalAlignment="Center">
 					<TextBlock.Style>

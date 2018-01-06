@@ -49,7 +49,7 @@ namespace BotzoneLocalRunner
 				Console.ForegroundColor = ConsoleColor.White;
 				Console.BackgroundColor = ConsoleColor.Red;
 			}
-			Console.WriteLine(message);
+			Console.Error.WriteLine(message);
 			Console.ResetColor();
 		}
     }

@@ -18,9 +18,9 @@ namespace BotzoneLocalRunner
 		public TaskCompletionSource<string> HumanTask { get; set; }
 
 		#region 开放给浏览器的回调方法
-		public void JudgeReady() => JudgeTask.SetResult("");
-		public void JudgeResponse(string str) => JudgeTask.SetResult(str);
-		public void JudgeFail(string str) => JudgeTask.SetException(new Exception(str));
+		public void JudgeReady() => JudgeTask?.SetResult("");
+		public void JudgeResponse(string str) => JudgeTask?.SetResult(str);
+		public void JudgeFail(string str) => JudgeTask?.SetException(new Exception(str));
 		public void HumanResponse(string str)
 		{
 			HumanTask?.SetResult(str);
@@ -105,9 +105,9 @@ namespace BotzoneLocalRunner
 			Logs = new List<ILogItem>();
 		}
 
-		public override void OnFinish(bool aborted)
+		public override async Task OnFinish(bool aborted)
 		{
-			base.OnFinish(aborted);
+			await base.OnFinish(aborted);
 			if (aborted)
 			{
 				SetStatus("aborted");
@@ -122,6 +122,10 @@ namespace BotzoneLocalRunner
 			}
 		}
 
+		/// <summary>
+		/// 实现了一个 Controller 逻辑
+		/// </summary>
+		/// <returns></returns>
 		public override async Task RunMatch()
 		{
 			Logger.Log(LogLevel.Info, "正在从 Botzone 载入 Judge 程序...");
@@ -165,7 +169,7 @@ namespace BotzoneLocalRunner
 					judgeItem.response = ex.Message;
 					judgeItem.verdict = "RE";
 					AddFullLogItem(judgeItem);
-					OnFinish(true);
+					await OnFinish(true);
 					return;
 				}
 
@@ -179,7 +183,7 @@ namespace BotzoneLocalRunner
 						Scores[int.Parse(pair.Key)] = 
 							pair.Value is string ? double.Parse(pair.Value) : pair.Value;
 					Logger.Log(LogLevel.OK, $"Judge 判定游戏结束，比分：{String.Join(", ", Scores)}");
-					OnFinish(false);
+					await OnFinish(false);
 					return;
 				}
 
@@ -208,7 +212,6 @@ namespace BotzoneLocalRunner
 					var conf = Configuration[id];
 					if (conf.Type != PlayerType.LocalHuman)
 					{
-						Logger.Log(LogLevel.InfoTip, $"Judge 向{id}号玩家（本地AI）发起请求...");
 						// 本地 AI
 						var runner = Runners[id];
 						conf.LogContent += ">>> REQUEST" + Environment.NewLine;
@@ -218,15 +221,19 @@ namespace BotzoneLocalRunner
 							Debug.Assert(req.Success);
 							runner.Requests.Add(req.Result);
 							conf.LogContent += req.Result + Environment.NewLine;
+							Logger.Log(LogLevel.InfoTip, $"Judge 向{id}号玩家（本地AI）发起请求：{req.Result}");
 						}
 						else
 						{
 							runner.Requests.Add(pair.Value);
 							conf.LogContent += JsonConvert.SerializeObject(pair.Value) + Environment.NewLine;
+							Logger.Log(LogLevel.InfoTip, $"Judge 向{id}号玩家（本地AI）发起请求：{pair.Value}");
 						}
 						ProgramLogItem resp = null;
 						try
 						{
+							if (Status == MatchStatus.Aborted)
+								return;
 							resp = await runner.RunForResponse();
 							if (runner.IsSimpleIO)
 							{
@@ -234,7 +241,7 @@ namespace BotzoneLocalRunner
 								Debug.Assert(req.Success);
 								resp.response = req.Result;
 							}
-							Logger.Log(LogLevel.OK, $"{id}号玩家（本地AI）给出了反馈");
+							Logger.Log(LogLevel.OK, $"{id}号玩家（本地AI）给出了反馈：{resp.raw}");
 						}
 						catch (TimeoutException)
 						{
@@ -282,6 +289,7 @@ namespace BotzoneLocalRunner
 
 		public override void ReplayMatch(IWebBrowser Browser)
 		{
+			// 将对局 log 插入网页中
 			BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
 				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
 				$@"
@@ -292,6 +300,14 @@ namespace BotzoneLocalRunner
 </script>
 ");
 			Browser.Load(Properties.Settings.Default.BotzoneLocalMatchURLBase + Configuration.Game.Name);
+		}
+
+		public override Task AbortMatch()
+		{
+			foreach (var runner in Runners)
+				if (runner.CurrentProcess != null)
+					runner.CurrentProcess.Kill();
+			return base.AbortMatch();
 		}
 	}
 }

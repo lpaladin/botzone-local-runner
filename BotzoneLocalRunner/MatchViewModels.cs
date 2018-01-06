@@ -304,7 +304,7 @@ namespace BotzoneLocalRunner
 				ValidationFailDueTo(StringResources.BOTZONE_MATCH_NO_HUMAN);
 				return;
 			}
-			if (!IsLocalMatch && localAICount > 1)
+			if (!IsLocalMatch && localAICount != 1)
 			{
 				ValidationFailDueTo(StringResources.BOTZONE_MATCH_ONE_LOCALAI);
 				return;

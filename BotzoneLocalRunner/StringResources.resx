@@ -124,7 +124,7 @@
     <value>&lt;请在这里输入Bot的ID&gt;</value>
   </data>
   <data name="BOTZONE_LOCALAI_URL_PROMPT" xml:space="preserve">
-    <value>&lt;在此粘贴Botzone本地AI的URL（点击头像菜单查看）&gt;</value>
+    <value>&lt;在此粘贴Botzone本地AI的URL（点击Botzone头像菜单查看）&gt;</value>
   </data>
   <data name="BOTZONE_LOCALAI_URL_REGEX" xml:space="preserve">
     <value>www.botzone.org/api/([0-9a-f]+)/([^/]+)/localai</value>
@@ -136,7 +136,7 @@
     <value>人类玩家只能和本地AI对战（否则请直接在Botzone网站上进行人机对局）</value>
   </data>
   <data name="BOTZONE_MATCH_ONE_LOCALAI" xml:space="preserve">
-    <value>与 Botzone 上的AI对战时只能有一个本地AI</value>
+    <value>与 Botzone 上的AI对战时必须且只能有一个本地AI</value>
   </data>
   <data name="CHOOSE_GAME_FIRST" xml:space="preserve">
     <value>请选择游戏</value>
@@ -191,5 +191,36 @@
   </data>
   <data name="MESSAGE" xml:space="preserve">
     <value>提示</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="CONSOLE_HELP" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CONSOLE_HELP.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
+  </data>
+  <data name="BAD_MATCH_COLLECTION_FORMAT" xml:space="preserve">
+    <value>对局组文件的格式有误，无法读取！</value>
+  </data>
+  <data name="CONSOLE_BAD_FORMAT" xml:space="preserve">
+    <value>调用格式不对，需要指明游戏与各个玩家的路径或者ID，用空格分隔</value>
+  </data>
+  <data name="CONSOLE_BAD_ID" xml:space="preserve">
+    <value>参数中的 "{0}" 既不是本地AI的程序路径，也不是Botzone上的ID</value>
+  </data>
+  <data name="CONSOLE_BAD_LOCALAI_URL" xml:space="preserve">
+    <value>该对局必须提供Botzone本地AI的URL才能进行。请提供-u参数。</value>
+  </data>
+  <data name="CONSOLE_BOTZONEMATCH" xml:space="preserve">
+    <value>将在Botzone上进行对局，并与本地AI进行交互</value>
+  </data>
+  <data name="CONSOLE_LOCALMATCH" xml:space="preserve">
+    <value>将进行本地对局……</value>
+  </data>
+  <data name="CONSOLE_MISSING_ARGUMENT" xml:space="preserve">
+    <value>{0} 选项的后面缺少参数</value>
+  </data>
+  <data name="MATCH_FAILED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NO_PARALLEL_MATCHES" xml:space="preserve">
+    <value>不应当有多个对局同时进行！</value>
   </data>
 </root>

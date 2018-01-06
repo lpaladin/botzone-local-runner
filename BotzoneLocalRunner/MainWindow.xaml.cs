@@ -108,13 +108,13 @@ namespace BotzoneLocalRunner
 		{
 			InitializeComponent();
 			BotzoneProtocol.CurrentBrowser = WebBrowser;
-WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
+			WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 
 			ViewModel.MatchCollection = new ObservableCollection<Match>();
 			ViewModel.TimeLimit = Properties.Settings.Default.TimeLimit;
 			LastConf = new SavedConfiguration();
 			ViewModel.CurrentConfiguration = new MatchConfiguration();
-			BotzoneProtocol.Credentials = ViewModel.Credentials = new BotzoneCredentials();
+			ViewModel.Credentials = BotzoneProtocol.Credentials;
 			ViewModel.AllGames = new RangeObservableCollection<Game>(new[] { new Game { Name = "..." } });
 			ViewModel.Logs = new LogCollection();
 
@@ -131,6 +131,7 @@ WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
+			AbortMatch().Wait();
 			if (ViewModel.CurrentConfiguration.Game != null)
 			{
 				Properties.Settings.Default.LastSelectedGame = ViewModel.CurrentConfiguration.Game.Name;
@@ -212,7 +213,7 @@ WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 			}
 			catch
 			{
-				Logger.Log(LogLevel.No, "对局失败");
+				Logger.Log(LogLevel.No, StringResources.MATCH_FAILED);
 				if (match != null)
 					match.Status = MatchStatus.Aborted;
 			}
@@ -226,10 +227,7 @@ WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 		private void WebBrowser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
 		{
 			if (e.IsLoading == false)
-			{
 				WebBrowser.EvaluateScriptAsync(AssetResources.SimplifyOnlineMatch);
-				WebBrowser.LoadingStateChanged -= WebBrowser_LoadingStateChanged;
-			}
 		}
 
 		private void ScrollChangedAndScrollToEnd(object sender, ScrollChangedEventArgs e)
@@ -268,15 +266,23 @@ WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 		{
 			if (ofdMatches.ShowDialog(this) == true)
 			{
-				using (var s = ofdMatches.OpenFile())
+				try
 				{
-					var f = new BinaryFormatter();
-					var collection = f.Deserialize(s) as Match[];
-					if (collection != null)
+					using (var s = ofdMatches.OpenFile())
 					{
-						ViewModel.MatchCollection = new ObservableCollection<Match>(collection);
-						Logger.Log(LogLevel.OK, $"已读取 {ViewModel.MatchCollection.Count} 场对局");
+						var f = new BinaryFormatter();
+						var collection = f.Deserialize(s) as Match[];
+						if (collection != null)
+						{
+							ViewModel.MatchCollection = new ObservableCollection<Match>(collection);
+							Logger.Log(LogLevel.OK, $"已读取 {ViewModel.MatchCollection.Count} 场对局");
+						}
 					}
+				}
+				catch (Exception ex)
+				{
+					Logger.Log(LogLevel.Error, ex.Message);
+					Logger.Log(LogLevel.Error, StringResources.BAD_MATCH_COLLECTION_FORMAT);
 				}
 			}
 		}
@@ -298,6 +304,22 @@ WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 				ViewModel.CurrentConfiguration = match.Configuration;
 				match.ReplayMatch(WebBrowser);
 			}
+		}
+
+		private async Task AbortMatch()
+		{
+			if (ViewModel.MatchStarted)
+			{
+				var match = Match.ActiveMatch;
+				await Match.ActiveMatch.AbortMatch();
+				ViewModel.MatchStarted = false;
+				ViewModel.MatchCollection.Add(match);
+			}
+		}
+
+		private async void btnAbortMatch_Click(object sender, RoutedEventArgs e)
+		{
+			await AbortMatch();
 		}
 	}
 }

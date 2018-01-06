@@ -58,6 +58,7 @@ namespace BotzoneLocalRunner
 
 		internal string BotzoneLocalAIURL() => $"{UserID}/{Secret}/localai";
 		internal string BotzoneRunMatchURL() => $"{UserID}/{Secret}/runmatch";
+		internal string BotzoneAbortMatchURL() => $"{UserID}/{Secret}/abortmatch";
 
 		private bool _IsValid = false;
 		public bool IsValid
@@ -161,7 +162,7 @@ namespace BotzoneLocalRunner
 
 	internal static class BotzoneProtocol
 	{
-		internal static BotzoneCredentials Credentials { get; set; }
+		internal static BotzoneCredentials Credentials { get; set; } = new BotzoneCredentials();
 
 		private static IWebBrowser _CurrentBrowser;
 		internal static IWebBrowser CurrentBrowser
@@ -270,15 +271,15 @@ namespace BotzoneLocalRunner
 				if (parts[2] == "0")
 				{
 					Logger.Log(LogLevel.Warning, $"对局 {match.MatchID} 中止");
-					match.OnFinish(true);
+					await match.OnFinish(true);
 				}
 				else
 				{
 					match.Scores = parts.Skip(3).Select(double.Parse).ToArray();
 					Logger.Log(LogLevel.OK, $"对局 {match.MatchID} 结束，比分为 {string.Join(", ", parts.Skip(3))}，本地AI分数 {parts[3 + match.MySlot]}");
-					match.OnFinish(false);
+					await match.OnFinish(false);
 				}
-				return false;
+				return true;
 			}
 			return false;
 		}
@@ -310,7 +311,25 @@ namespace BotzoneLocalRunner
 			return matchID;
 		}
 
-		internal static async void FetchFullLogs(this BotzoneMatch match)
+		internal static async Task AbortMatch(string matchID)
+		{
+			do
+			{
+				Logger.Log(LogLevel.Info, "尝试向 Botzone 发起中止对局请求……");
+				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneAbortMatchURL());
+				req.Headers.Add("X-Matchid", matchID);
+				var res = await client.SendAsync(req);
+				if (CheckResponse(res, await res.Content.ReadAsStringAsync()))
+					break;
+
+				Logger.Log(LogLevel.InfoTip, "5秒后重试……");
+				await Task.Delay(5000);
+			} while (true);
+
+			Logger.Log(LogLevel.Warning, "成功中止了对局：" + matchID);
+		}
+
+		internal static async Task FetchFullLogs(this BotzoneMatch match)
 		{
 			do
 			{

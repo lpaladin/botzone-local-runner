@@ -70,7 +70,16 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 &lt;在此粘贴Botzone本地AI的URL（点击头像菜单查看）&gt; 的本地化字符串。
+        ///   查找类似 对局组文件的格式有误，无法读取！ 的本地化字符串。
+        /// </summary>
+        public static string BAD_MATCH_COLLECTION_FORMAT {
+            get {
+                return ResourceManager.GetString("BAD_MATCH_COLLECTION_FORMAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 &lt;在此粘贴Botzone本地AI的URL（点击Botzone头像菜单查看）&gt; 的本地化字符串。
         /// </summary>
         public static string BOTZONE_LOCALAI_URL_PROMPT {
             get {
@@ -106,7 +115,7 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 与 Botzone 上的AI对战时只能有一个本地AI 的本地化字符串。
+        ///   查找类似 与 Botzone 上的AI对战时必须且只能有一个本地AI 的本地化字符串。
         /// </summary>
         public static string BOTZONE_MATCH_ONE_LOCALAI {
             get {
@@ -133,11 +142,93 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
+        ///   查找类似 调用格式不对，需要指明游戏与各个玩家的路径或者ID，用空格分隔 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_BAD_FORMAT {
+            get {
+                return ResourceManager.GetString("CONSOLE_BAD_FORMAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 参数中的 &quot;{0}&quot; 既不是本地AI的程序路径，也不是Botzone上的ID 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_BAD_ID {
+            get {
+                return ResourceManager.GetString("CONSOLE_BAD_ID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 该对局必须提供Botzone本地AI的URL才能进行。请提供-u参数。 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_BAD_LOCALAI_URL {
+            get {
+                return ResourceManager.GetString("CONSOLE_BAD_LOCALAI_URL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 将在Botzone上进行对局，并与本地AI进行交互 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_BOTZONEMATCH {
+            get {
+                return ResourceManager.GetString("CONSOLE_BOTZONEMATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 以下是工具使用帮助——
+        ///命令行格式：
+        ///	{0} &lt;游戏名&gt; &lt;id-0&gt; &lt;id-1&gt; ... [-u &lt;本地AI的URL&gt;] [-o &lt;对局组路径&gt;] [-l &lt;log路径&gt;]
+        ///	{0} -h
+        ///
+        ///命令行参数帮助：
+        ///	&lt;id-i&gt;
+        ///		如果玩家i是本地AI，那么写玩家i的本地程序文件路径；如果玩家i是Botzone上的AI，那么写玩家i在Botzone上的BotID。
+        ///	-h
+        ///		显示此帮助
+        ///	-u &lt;本地AI的URL，形如https://www.botzone.org/api/xxx/xxx/localai&gt;
+        ///		有Botzone的AI参与时必填。点击Botzone上的头像菜单可以查看本地AI配置，其中就有本地AI的URL，复制过来即可。
+        ///	-o &lt;对局组路径，形如xxx.matches&gt;
+        ///		如果有该选项，则将该场对局保存到现有对局组或新建的对局组。
+        ///	-l &lt;log路径，形如xxx.json&gt;
+        ///		如果有该选项，则将该场对局的完整 log 以单行 json 格式保存到文本文件。
+        ///
+        ///程序输出格式：
+        ///	第一行： &lt;json 格式的对局的完整 log&gt;
+        ///	第二行： &lt;对局 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_HELP {
+            get {
+                return ResourceManager.GetString("CONSOLE_HELP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 正在加载图形界面…… 的本地化字符串。
         /// </summary>
         public static string CONSOLE_LOAD_GUI {
             get {
                 return ResourceManager.GetString("CONSOLE_LOAD_GUI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 将进行本地对局…… 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_LOCALMATCH {
+            get {
+                return ResourceManager.GetString("CONSOLE_LOCALMATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 {0} 选项的后面缺少参数 的本地化字符串。
+        /// </summary>
+        public static string CONSOLE_MISSING_ARGUMENT {
+            get {
+                return ResourceManager.GetString("CONSOLE_MISSING_ARGUMENT", resourceCulture);
             }
         }
         
@@ -214,6 +305,15 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
+        ///   查找类似  的本地化字符串。
+        /// </summary>
+        public static string MATCH_FAILED {
+            get {
+                return ResourceManager.GetString("MATCH_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 对局正在进行，无法回放过往对局。 的本地化字符串。
         /// </summary>
         public static string MATCH_RUNNING_NO_REPLAY {
@@ -255,6 +355,15 @@ namespace BotzoneLocalRunner {
         public static string MESSAGE {
             get {
                 return ResourceManager.GetString("MESSAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 不应当有多个对局同时进行！ 的本地化字符串。
+        /// </summary>
+        public static string NO_PARALLEL_MATCHES {
+            get {
+                return ResourceManager.GetString("NO_PARALLEL_MATCHES", resourceCulture);
             }
         }
         

@@ -55,6 +55,9 @@ namespace BotzoneLocalRunner
 	[Serializable]
 	public partial class MatchConfiguration : ISerializable
 	{
+		/// <summary>
+		/// 用于简化带有很多ViewModel相关域从而难以序列化的PlayerConfiguration类
+		/// </summary>
 		[Serializable]
 		public class CompactPlayerConfiguration
 		{
@@ -63,6 +66,9 @@ namespace BotzoneLocalRunner
 			public string LogContent;
 		}
 
+		/// <summary>
+		/// 反序列化构造函数
+		/// </summary>
 		protected MatchConfiguration(SerializationInfo info, StreamingContext context)
 		{
 			var conf = info.GetValue("Configuration",
@@ -80,6 +86,9 @@ namespace BotzoneLocalRunner
 			}
 		}
 
+		/// <summary>
+		/// 序列化函数
+		/// </summary>
 		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("Game", Game.Name);
@@ -96,6 +105,8 @@ namespace BotzoneLocalRunner
 	[Serializable]
 	public abstract class Match
 	{
+		public static Match ActiveMatch;
+
 		public MatchConfiguration Configuration { get; set; }
 		public DateTime BeginTime { get; set; }
 		public DateTime EndTime { get; set; }
@@ -116,6 +127,9 @@ namespace BotzoneLocalRunner
 			Configuration = conf;
 			Initdata = conf.Initdata;
 			BeginTime = DateTime.Now;
+			if (ActiveMatch != null)
+				throw new Exception(StringResources.NO_PARALLEL_MATCHES);
+			ActiveMatch = this;
 		}
 
 		public abstract Task RunMatch();
@@ -134,22 +148,27 @@ namespace BotzoneLocalRunner
 			Logs = JsonConvert.DeserializeObject<List<ILogItem>>(SerializedLogs, BotzoneProtocol.logConverter);
 		}
 
-		public virtual void OnFinish(bool aborted)
+		public virtual Task OnFinish(bool aborted)
 		{
 			EndTime = DateTime.Now;
 			if (aborted)
 				Status = MatchStatus.Aborted;
 			else
 				Status = MatchStatus.Finished;
+			ActiveMatch = null;
+			return Task.CompletedTask;
 		}
 
 		public abstract void ReplayMatch(IWebBrowser Browser);
+		public virtual Task AbortMatch()
+		{
+			return OnFinish(true);
+		}
 	}
 
 	[Serializable]
 	public class BotzoneMatch : Match
 	{
-		public static BotzoneMatch ActiveMatch;
 		public int MySlot { get; }
 		public string MatchID { get; }
 
@@ -170,15 +189,12 @@ namespace BotzoneLocalRunner
 			{
 				ProgramPath = conf[MySlot].ID
 			};
-			if (ActiveMatch != null)
-				throw new Exception("不应当有多个对局同时进行！");
-			ActiveMatch = this;
 		}
 
-		public override void OnFinish(bool aborted)
+		public override async Task OnFinish(bool aborted)
 		{
-			base.OnFinish(aborted);
-			this.FetchFullLogs();
+			await base.OnFinish(aborted);
+			await this.FetchFullLogs();
 			ActiveMatch = null;
 		}
 
@@ -192,15 +208,25 @@ namespace BotzoneLocalRunner
 					break;
 				MyConf.LogContent += (">>> REQUEST" +
 					Environment.NewLine + Runner.Requests.Last() + Environment.NewLine);
+				Util.Logger.Log(LogLevel.Info, $"本地AI收到的 request：{Runner.Requests.Last()}");
 				await Runner.RunForResponse();
 				MyConf.LogContent += ("<<< RESPONSE" +
 					Environment.NewLine + Runner.Responses.Last() + Environment.NewLine);
+				Util.Logger.Log(LogLevel.Info, $"本地AI给出的 response：{Runner.Responses.Last()}");
 			}
 		}
 
 		public override void ReplayMatch(IWebBrowser Browser)
 		{
 			Browser.Load(Properties.Settings.Default.BotzoneMatchURLBase + MatchID);
+		}
+
+		public override async Task AbortMatch()
+		{
+			if (Runner.CurrentProcess != null)
+				Runner.CurrentProcess.Kill();
+			await BotzoneProtocol.AbortMatch(MatchID);
+			await base.AbortMatch();
 		}
 	}
 }
