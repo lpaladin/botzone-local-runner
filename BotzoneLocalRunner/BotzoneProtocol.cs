@@ -128,8 +128,12 @@ namespace BotzoneLocalRunner
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			var obj = JObject.Load(reader);
-			var arr = (JArray)obj["logs"];
+			JArray arr;
+			if (reader.TokenType == JsonToken.StartObject)
+				arr = (JArray)JObject.Load(reader)["logs"];
+			else
+				arr = JArray.Load(reader);
+
 			List<ILogItem> logs = new List<ILogItem>(arr.Count);
 			int i, n = arr.Count;
 			for (i = 0; i < n; i++)
@@ -181,7 +185,7 @@ namespace BotzoneLocalRunner
 		{
 			BaseAddress = new Uri(Properties.Settings.Default.BotzoneAPIBase)
 		};
-		static MatchLogConverter logConverter = new MatchLogConverter();
+		internal static MatchLogConverter logConverter = new MatchLogConverter();
 
 		/// <summary>
 		/// 检查请求的返回情况并记录

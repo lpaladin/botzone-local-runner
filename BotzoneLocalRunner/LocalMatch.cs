@@ -171,6 +171,7 @@ namespace BotzoneLocalRunner
 
 				// Judge 返回处理
 				EmitEvent("match.newlog", judgeItem.output.display ?? "");
+				DisplayLogs.Add(judgeItem.output.display);
 				if (judgeItem.output.command == "finish")
 				{
 					// 判定游戏结束

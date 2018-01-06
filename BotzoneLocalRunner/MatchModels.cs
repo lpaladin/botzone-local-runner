@@ -1,4 +1,6 @@
 ﻿using CefSharp;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace BotzoneLocalRunner
 {
+	[Serializable]
 	public class JudgeOutput
 	{
 		public string command;
@@ -21,6 +24,7 @@ namespace BotzoneLocalRunner
 		public string initdata;
 	}
 
+	[Serializable]
 	public class ProgramLogItem
 	{
 		public int time;
@@ -32,7 +36,10 @@ namespace BotzoneLocalRunner
 		public dynamic response;
 	}
 
+	[Serializable]
 	public class BotLogItem : Dictionary<string, ProgramLogItem>, ILogItem { }
+
+	[Serializable]
 	public class JudgeLogItem : ProgramLogItem, ILogItem { }
 
 	public interface ILogItem { }
@@ -58,7 +65,7 @@ namespace BotzoneLocalRunner
 
 		protected MatchConfiguration(SerializationInfo info, StreamingContext context)
 		{
-			var conf = info.GetValue("Configuration", 
+			var conf = info.GetValue("Configuration",
 				typeof(CompactPlayerConfiguration[])) as CompactPlayerConfiguration[];
 			Game = new Game
 			{
@@ -66,13 +73,11 @@ namespace BotzoneLocalRunner
 				PlayerCount = conf.Length
 			};
 			for (int i = 0; i < conf.Length; i++)
-				Add(new PlayerConfiguration
-				{
-					SlotID = i, // 顺序很重要
-					Type = conf[i].Type,
-					ID = conf[i].ID,
-					LogContent = conf[i].LogContent
-				});
+			{
+				this[i].Type = conf[i].Type;
+				this[i].ID = conf[i].ID;
+				this[i].LogContent = conf[i].LogContent;
+			}
 		}
 
 		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -92,13 +97,19 @@ namespace BotzoneLocalRunner
 	public abstract class Match
 	{
 		public MatchConfiguration Configuration { get; set; }
-		public List<dynamic> DisplayLogs { get; set; }
 		public DateTime BeginTime { get; set; }
 		public DateTime EndTime { get; set; }
-		public List<ILogItem> Logs { get; set; }
 		public string Initdata { get; set; } = "";
 		public double[] Scores { get; set; }
 		public MatchStatus Status { get; set; } = MatchStatus.Waiting;
+
+		[NonSerialized]
+		public List<dynamic> DisplayLogs;
+		[NonSerialized]
+		public List<ILogItem> Logs;
+
+		private string SerializedDisplayLogs;
+		private string SerializedLogs;
 
 		protected Match(MatchConfiguration conf)
 		{
@@ -108,6 +119,20 @@ namespace BotzoneLocalRunner
 		}
 
 		public abstract Task RunMatch();
+
+		[OnSerializing]
+		private void SerializeJSONDynamics(StreamingContext context)
+		{
+			SerializedDisplayLogs = JsonConvert.SerializeObject(DisplayLogs);
+			SerializedLogs = JsonConvert.SerializeObject(Logs);
+		}
+
+		[OnDeserialized]
+		private void DeserializeJSONDynamics(StreamingContext context)
+		{
+			DisplayLogs = JsonConvert.DeserializeObject<List<dynamic>>(SerializedDisplayLogs);
+			Logs = JsonConvert.DeserializeObject<List<ILogItem>>(SerializedLogs, BotzoneProtocol.logConverter);
+		}
 
 		public virtual void OnFinish(bool aborted)
 		{

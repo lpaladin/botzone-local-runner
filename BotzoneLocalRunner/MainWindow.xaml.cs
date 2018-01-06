@@ -108,6 +108,7 @@ namespace BotzoneLocalRunner
 		{
 			InitializeComponent();
 			BotzoneProtocol.CurrentBrowser = WebBrowser;
+WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 
 			ViewModel.MatchCollection = new ObservableCollection<Match>();
 			ViewModel.TimeLimit = Properties.Settings.Default.TimeLimit;
@@ -205,8 +206,6 @@ namespace BotzoneLocalRunner
 				if (match is BotzoneMatch)
 					WebBrowser.Load(Properties.Settings.Default.BotzoneMatchURLBase + (match as BotzoneMatch).MatchID);
 
-				WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
-
 				ViewModel.MatchStarted = true;
 
 				await match.RunMatch();
@@ -247,7 +246,9 @@ namespace BotzoneLocalRunner
 
 		private void btnClear_Click(object sender, RoutedEventArgs e)
 		{
+			int count = ViewModel.MatchCollection.Count;
 			ViewModel.MatchCollection.Clear();
+			Logger.Log(LogLevel.Warning, $"已删除 {count} 场对局");
 		}
 
 		private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -259,6 +260,7 @@ namespace BotzoneLocalRunner
 					var f = new BinaryFormatter();
 					f.Serialize(s, ViewModel.MatchCollection.ToArray());
 				}
+				Logger.Log(LogLevel.OK, $"已保存 {ViewModel.MatchCollection.Count} 场对局");
 			}
 		}
 
@@ -271,12 +273,15 @@ namespace BotzoneLocalRunner
 					var f = new BinaryFormatter();
 					var collection = f.Deserialize(s) as Match[];
 					if (collection != null)
+					{
 						ViewModel.MatchCollection = new ObservableCollection<Match>(collection);
+						Logger.Log(LogLevel.OK, $"已读取 {ViewModel.MatchCollection.Count} 场对局");
+					}
 				}
 			}
 		}
 
-		private void List_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private async void List_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			if (ViewModel.MatchStarted)
 			{
@@ -289,6 +294,7 @@ namespace BotzoneLocalRunner
 			if (match != null)
 			{
 				match.Configuration.Game = ViewModel.AllGames.First(g => g.Name == match.Configuration.Game.Name);
+				await Task.Delay(500);
 				ViewModel.CurrentConfiguration = match.Configuration;
 				match.ReplayMatch(WebBrowser);
 			}
