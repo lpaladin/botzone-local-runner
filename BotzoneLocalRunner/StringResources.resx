@@ -223,4 +223,7 @@
   <data name="NO_PARALLEL_MATCHES" xml:space="preserve">
     <value>不应当有多个对局同时进行！</value>
   </data>
+  <data name="TITLE" xml:space="preserve">
+    <value>Botzone 本地调试工具</value>
+  </data>
 </root>

@@ -80,7 +80,7 @@ namespace BotzoneLocalRunner
             }
             finally
             {
-                BitmapHelper.DeleteObject(hBitmap);
+                NativeMethods.DeleteObject(hBitmap);
             }
         }
 

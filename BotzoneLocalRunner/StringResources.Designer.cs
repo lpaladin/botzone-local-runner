@@ -386,6 +386,15 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
+        ///   查找类似 Botzone 本地调试工具 的本地化字符串。
+        /// </summary>
+        public static string TITLE {
+            get {
+                return ResourceManager.GetString("TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 人类玩家最多只能有一个 的本地化字符串。
         /// </summary>
         public static string TOO_MANY_HUMAN {

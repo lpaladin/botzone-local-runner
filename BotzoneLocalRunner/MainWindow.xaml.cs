@@ -15,18 +15,19 @@ using System.Windows.Media;
 using System.Configuration;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 
 namespace BotzoneLocalRunner
 {
-	internal static class NativeMethods
+	internal static partial class NativeMethods
 	{
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool AddClipboardFormatListener(IntPtr hwnd);
+		internal static extern bool AddClipboardFormatListener(IntPtr hwnd);
 
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
+		internal static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
 	}
 
 	public class SavedConfiguration : ApplicationSettingsBase
@@ -107,6 +108,8 @@ namespace BotzoneLocalRunner
 		public MainWindow()
 		{
 			InitializeComponent();
+			Title = StringResources.TITLE + " " + Assembly.GetEntryAssembly().GetName().Version;
+
 			BotzoneProtocol.CurrentBrowser = WebBrowser;
 			WebBrowser.LoadingStateChanged += WebBrowser_LoadingStateChanged;
 

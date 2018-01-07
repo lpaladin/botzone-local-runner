@@ -135,10 +135,10 @@ namespace BotzoneLocalRunner
 			   select new ValueDescription { Value = e, Description = e.Description() };
 	}
 
-	public static class BitmapHelper
+	internal static partial class NativeMethods
 	{
 		[System.Runtime.InteropServices.DllImport("gdi32.dll")]
-		public static extern bool DeleteObject(IntPtr hObject);
+		internal static extern bool DeleteObject(IntPtr hObject);
 	}
 
 	[ValueConversion(typeof(Bitmap), typeof(BitmapSource))]
@@ -156,7 +156,7 @@ namespace BotzoneLocalRunner
 			}
 			finally
 			{
-				BitmapHelper.DeleteObject(hBitmap);
+				NativeMethods.DeleteObject(hBitmap);
 			}
 		}
 

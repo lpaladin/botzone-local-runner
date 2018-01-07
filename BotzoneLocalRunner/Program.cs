@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -73,6 +74,7 @@ namespace BotzoneLocalRunner
 					switch (arg)
 					{
 						case "-h":
+							Console.WriteLine(StringResources.TITLE + " " + Assembly.GetEntryAssembly().GetName().Version);
 							Console.WriteLine(String.Format(StringResources.CONSOLE_HELP, args[0]));
 							return;
 						case "-o":
