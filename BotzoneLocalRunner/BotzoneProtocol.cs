@@ -239,7 +239,13 @@ namespace BotzoneLocalRunner
 				Logger.Log(LogLevel.InfoTip, "连接 Botzone，并等待新 request");
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneLocalAIURL());
 				if (match.Runner.Responses.Count > 0)
-					req.Headers.Add("X-Match-" + match.MatchID, match.Runner.Responses.Last());
+				{
+					var last = match.Runner.Responses.Last();
+					if (LocalProgramRunner.IsSimpleIO)
+						req.Headers.Add("X-Match-" + match.MatchID, last);
+					else
+						req.Headers.Add("X-Match-" + match.MatchID, JsonConvert.SerializeObject(last, Formatting.None));
+				}
 				var res = await client.SendAsync(req);
 				raw = await res.Content.ReadAsStringAsync();
 				if (CheckResponse(res, raw))
@@ -257,7 +263,11 @@ namespace BotzoneLocalRunner
 			{
 				if (lines[i] != match.MatchID)
 					continue;
-				match.Runner.Requests.Add(lines[i + 1]);
+				string req = lines[i + 1];
+				if (!LocalProgramRunner.IsSimpleIO)
+					match.Runner.Requests.Add(JsonConvert.DeserializeObject(req));
+				else
+					match.Runner.Requests.Add(req);
 				match.Status = MatchStatus.Running;
 				Logger.Log(LogLevel.InfoTip, $"对局 {match.MatchID} 获得一条新 request");
 				return true;
@@ -295,7 +305,7 @@ namespace BotzoneLocalRunner
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneRunMatchURL());
 				req.Headers.Add("X-Game", conf.Game.Name);
 				req.Headers.Add("X-Initdata", conf.Initdata);
-				req.Headers.Add("X-UseSimpleIO", LocalProgramRunner.IsSimpleIO.ToString());
+				req.Headers.Add("X-UseSimpleIO", LocalProgramRunner.IsSimpleIO ? "true" : "false");
 				req.Headers.Add("X-Timelimit", Properties.Settings.Default.TimeLimit.TotalSeconds.ToString());
 				for (int i = 0; i < conf.Count; i++)
 					req.Headers.Add("X-Player-" + i, conf[i].Type == PlayerType.BotzoneBot ? conf[i].ID : "me");

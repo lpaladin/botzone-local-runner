@@ -23,5 +23,8 @@
     <Setting Name="BotzoneLocalMatchURLBase" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://www.botzone.org/localmatch/</Value>
     </Setting>
+    <Setting Name="UseSimpleIO" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

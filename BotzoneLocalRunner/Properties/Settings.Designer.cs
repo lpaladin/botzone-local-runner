@@ -94,5 +94,17 @@ namespace BotzoneLocalRunner.Properties {
                 return ((string)(this["BotzoneLocalMatchURLBase"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseSimpleIO {
+            get {
+                return ((bool)(this["UseSimpleIO"]));
+            }
+            set {
+                this["UseSimpleIO"] = value;
+            }
+        }
     }
 }

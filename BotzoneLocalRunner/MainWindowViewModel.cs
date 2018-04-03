@@ -144,7 +144,7 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		private bool _IsSimpleIO = LocalProgramRunner.IsSimpleIO;
+		private bool _IsSimpleIO = false;
 		public bool IsSimpleIO
 		{
 			get

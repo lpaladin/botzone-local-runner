@@ -123,6 +123,7 @@ namespace BotzoneLocalRunner
 
 			if (Properties.Settings.Default.LastBotzoneLocalAIURL?.Length > 0)
 				BotzoneProtocol.Credentials.BotzoneCopiedURL = Properties.Settings.Default.LastBotzoneLocalAIURL;
+			ViewModel.IsSimpleIO = Properties.Settings.Default.UseSimpleIO;
 
 			Logger = new ViewModelLogger(ViewModel.Logs);
 			WebBrowser.BrowserSettings = new BrowserSettings
@@ -138,6 +139,7 @@ namespace BotzoneLocalRunner
 			if (ViewModel.CurrentConfiguration.Game != null)
 			{
 				Properties.Settings.Default.LastSelectedGame = ViewModel.CurrentConfiguration.Game.Name;
+				Properties.Settings.Default.UseSimpleIO = ViewModel.IsSimpleIO;
 				LastConf.Configuration = (from player in ViewModel.CurrentConfiguration
 					select new PlainPlayerConfiguration
 					{
@@ -218,7 +220,7 @@ namespace BotzoneLocalRunner
 			{
 				Logger.Log(LogLevel.No, StringResources.MATCH_FAILED + ex.Message);
 				if (match != null)
-					match.Status = MatchStatus.Aborted;
+					await match.AbortMatch();
 			}
 			finally
 			{
