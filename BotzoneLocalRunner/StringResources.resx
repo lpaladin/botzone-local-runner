@@ -218,7 +218,7 @@
     <value>{0} 选项的后面缺少参数</value>
   </data>
   <data name="MATCH_FAILED" xml:space="preserve">
-    <value />
+    <value>对局失败：</value>
   </data>
   <data name="NO_PARALLEL_MATCHES" xml:space="preserve">
     <value>不应当有多个对局同时进行！</value>

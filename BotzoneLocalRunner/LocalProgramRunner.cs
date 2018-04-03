@@ -24,8 +24,8 @@ namespace BotzoneLocalRunner
 		public dynamic GlobalData { get; set; }
 		public Process CurrentProcess { get; set; }
 
-		// 暂时先不考虑本地程序不是简单IO的情况
-		public bool IsSimpleIO { get; set; } = true;
+		// 暂时默认为非简单IO（TODO：命令行下）
+		public static bool IsSimpleIO { get; set; } = false;
 
 		/// <summary>
 		/// 运行程序，直到得到反馈
@@ -59,13 +59,13 @@ namespace BotzoneLocalRunner
 				{
 					p.StandardInput.WriteLine(JsonConvert.SerializeObject(new
 					{
-						request = Requests,
+						requests = Requests,
 						responses = Responses,
 						data = Data,
 						globaldata = GlobalData,
 						time_limit = Properties.Settings.Default.TimeLimit.TotalMilliseconds,
 						memory_limit = 256
-					}));
+					}, Formatting.None));
 					p.StandardInput.Close();
 				}
 
@@ -146,13 +146,16 @@ namespace BotzoneLocalRunner
 					processInfo.FileName = ProgramPath;
 					break;
 				case ".py":
-					processInfo.FileName = "python " + ProgramPath;
+					processInfo.FileName = "python";
+					processInfo.Arguments = ProgramPath;
 					break;
 				case ".js":
-					processInfo.FileName = "node " + ProgramPath;
+					processInfo.FileName = "node";
+					processInfo.Arguments = ProgramPath;
 					break;
 				case ".class":
-					processInfo.FileName = "java " + Path.GetFileNameWithoutExtension(ProgramPath);
+					processInfo.FileName = "java";
+					processInfo.Arguments = Path.GetFileNameWithoutExtension(ProgramPath);
 					break;
 				default:
 					return null;

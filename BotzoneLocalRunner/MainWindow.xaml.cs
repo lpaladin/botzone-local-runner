@@ -214,9 +214,9 @@ namespace BotzoneLocalRunner
 
 				await match.RunMatch();
 			}
-			catch
+			catch (Exception ex)
 			{
-				Logger.Log(LogLevel.No, StringResources.MATCH_FAILED);
+				Logger.Log(LogLevel.No, StringResources.MATCH_FAILED + ex.Message);
 				if (match != null)
 					match.Status = MatchStatus.Aborted;
 			}

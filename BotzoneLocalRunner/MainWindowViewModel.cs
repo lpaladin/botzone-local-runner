@@ -144,6 +144,23 @@ namespace BotzoneLocalRunner
 			}
 		}
 
+		private bool _IsSimpleIO = LocalProgramRunner.IsSimpleIO;
+		public bool IsSimpleIO
+		{
+			get
+			{
+				return _IsSimpleIO;
+			}
+			set
+			{
+				if (value != _IsSimpleIO)
+				{
+					LocalProgramRunner.IsSimpleIO = _IsSimpleIO = value;
+					NotifyPropertyChanged("IsSimpleIO");
+				}
+			}
+		}
+
 
 		private ObservableCollection<Match> _MatchCollection;
 		public ObservableCollection<Match> MatchCollection

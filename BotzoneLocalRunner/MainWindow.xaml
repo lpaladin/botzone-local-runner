@@ -179,7 +179,7 @@
 						</ComboBox.Style>
 					</ComboBox>
 				</BulletDecorator>
-				<GroupBox Header="玩家配备" Margin="0,26,0,45">
+				<GroupBox Header="玩家配备" Margin="0,26,0,65">
 					<GroupBox.Style>
 						<Style>
 							<Setter Property="GroupBox.IsEnabled" Value="True" />
@@ -286,6 +286,7 @@
 						</Style>
 					</TextBlock.Style>
 				</TextBlock>
+				<CheckBox Content="本地AI使用简单IO" Margin="55,0,55,45" IsChecked="{Binding IsSimpleIO}" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
 
 			</Grid>
 		</Expander>

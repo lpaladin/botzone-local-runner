@@ -178,7 +178,8 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 以下是工具使用帮助——
+        ///   查找类似 作者：zhouhy
+        ///以下是工具使用帮助——
         ///命令行格式：
         ///	{0} &lt;游戏名&gt; &lt;id-0&gt; &lt;id-1&gt; ... [-u &lt;本地AI的URL&gt;] [-o &lt;对局组路径&gt;] [-l &lt;log路径&gt;]
         ///	{0} -h
@@ -196,8 +197,7 @@ namespace BotzoneLocalRunner {
         ///		如果有该选项，则将该场对局的完整 log 以单行 json 格式保存到文本文件。
         ///
         ///程序输出格式：
-        ///	第一行： &lt;json 格式的对局的完整 log&gt;
-        ///	第二行： &lt;对局 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///	第一行： &lt;json 格式的对局的完整 log&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         public static string CONSOLE_HELP {
             get {
@@ -305,7 +305,7 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 对局失败： 的本地化字符串。
         /// </summary>
         public static string MATCH_FAILED {
             get {

@@ -215,7 +215,7 @@ namespace BotzoneLocalRunner
 						// 本地 AI
 						var runner = Runners[id];
 						conf.LogContent += ">>> REQUEST" + Environment.NewLine;
-						if (runner.IsSimpleIO)
+						if (LocalProgramRunner.IsSimpleIO)
 						{
 							JavascriptResponse req = await TransformRequestToSimpleIO(pair.Value);
 							Debug.Assert(req.Success);
@@ -235,7 +235,7 @@ namespace BotzoneLocalRunner
 							if (Status == MatchStatus.Aborted)
 								return;
 							resp = await runner.RunForResponse();
-							if (runner.IsSimpleIO)
+							if (LocalProgramRunner.IsSimpleIO)
 							{
 								JavascriptResponse req = await TransformSimpleIOToResponse(resp.raw);
 								Debug.Assert(req.Success);
@@ -259,6 +259,15 @@ namespace BotzoneLocalRunner
 								response = e.Message
 							};
 							Logger.Log(LogLevel.Warning, $"{id}号玩家（本地AI）崩溃了：{e.Message}");
+						}
+						catch (Exception e)
+						{
+							resp = new ProgramLogItem
+							{
+								verdict = "RE",
+								response = e.Message
+							};
+							Logger.Log(LogLevel.No, $"{id}号玩家（本地AI）无法正常启动：{e.Message}");
 						}
 						finally
 						{

@@ -295,6 +295,7 @@ namespace BotzoneLocalRunner
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneRunMatchURL());
 				req.Headers.Add("X-Game", conf.Game.Name);
 				req.Headers.Add("X-Initdata", conf.Initdata);
+				req.Headers.Add("X-UseSimpleIO", LocalProgramRunner.IsSimpleIO.ToString());
 				req.Headers.Add("X-Timelimit", Properties.Settings.Default.TimeLimit.TotalSeconds.ToString());
 				for (int i = 0; i < conf.Count; i++)
 					req.Headers.Add("X-Player-" + i, conf[i].Type == PlayerType.BotzoneBot ? conf[i].ID : "me");
