@@ -114,6 +114,9 @@ namespace BotzoneLocalRunner
 									String.Format(StringResources.CONSOLE_MISSING_ARGUMENT, lastOption));
 							next = url => BotzoneProtocol.Credentials.BotzoneCopiedURL = url;
 							break;
+						case "--simple-io":
+							LocalProgramRunner.IsSimpleIO = true;
+							break;
 						default:
 							if (next != null)
 							{
