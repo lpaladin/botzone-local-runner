@@ -131,7 +131,7 @@ namespace BotzoneLocalRunner
 			Logger.Log(LogLevel.Info, "正在从 Botzone 载入 Judge 程序...");
 			Status = MatchStatus.Waiting;
 			BrowserJSObject.Instance.JudgeTask = new TaskCompletionSource<string>();
-			Browser.Load(Properties.Settings.Default.BotzoneLocalMatchURLBase + Configuration.Game.Name);
+			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
 
 			for (int i = 0; i < Configuration.Count; i++)
 				SetIsSimpleIO(i, Configuration[i].Type == PlayerType.LocalAI);
@@ -308,7 +308,7 @@ namespace BotzoneLocalRunner
 	loglist = {JsonConvert.SerializeObject(Logs)};
 </script>
 ");
-			Browser.Load(Properties.Settings.Default.BotzoneLocalMatchURLBase + Configuration.Game.Name);
+			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
 		}
 
 		public override Task AbortMatch()

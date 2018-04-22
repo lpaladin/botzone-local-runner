@@ -134,7 +134,7 @@ namespace BotzoneLocalRunner
 		IResponseFilter IRequestHandler.GetResourceResponseFilter(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, IResponse response)
 		{
 			var url = new Uri(request.Url);
-			if (url.AbsoluteUri.StartsWith(Properties.Settings.Default.BotzoneLocalMatchURLBase,
+			if (url.AbsoluteUri.StartsWith(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(""),
 				StringComparison.OrdinalIgnoreCase))
 			{
 				return MatchInjectFilter;

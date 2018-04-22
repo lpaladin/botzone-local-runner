@@ -23,24 +23,6 @@ namespace BotzoneLocalRunner.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.botzone.org/api/")]
-        public string BotzoneAPIBase {
-            get {
-                return ((string)(this["BotzoneAPIBase"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("public/games")]
-        public string BotzoneGamesPath {
-            get {
-                return ((string)(this["BotzoneGamesPath"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -50,15 +32,6 @@ namespace BotzoneLocalRunner.Properties {
             }
             set {
                 this["LastBotzoneLocalAIURL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.botzone.org/match/")]
-        public string BotzoneMatchURLBase {
-            get {
-                return ((string)(this["BotzoneMatchURLBase"]));
             }
         }
         
@@ -83,15 +56,6 @@ namespace BotzoneLocalRunner.Properties {
             }
             set {
                 this["TimeLimit"] = value;
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.botzone.org/localmatch/")]
-        public string BotzoneLocalMatchURLBase {
-            get {
-                return ((string)(this["BotzoneLocalMatchURLBase"]));
             }
         }
         

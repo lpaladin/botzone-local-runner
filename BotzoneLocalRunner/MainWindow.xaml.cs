@@ -210,7 +210,7 @@ namespace BotzoneLocalRunner
 			{
 				match = await ViewModel.CurrentConfiguration.CreateMatch();
 				if (match is BotzoneMatch)
-					WebBrowser.Load(Properties.Settings.Default.BotzoneMatchURLBase + (match as BotzoneMatch).MatchID);
+					WebBrowser.Load(BotzoneProtocol.Credentials.BotzoneMatchURL((match as BotzoneMatch).MatchID, false));
 
 				ViewModel.MatchStarted = true;
 

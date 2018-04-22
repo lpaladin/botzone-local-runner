@@ -124,7 +124,7 @@ namespace BotzoneLocalRunner
 
 		protected Match(MatchConfiguration conf)
 		{
-			Configuration = conf;
+			Configuration = ObjectCopier.Clone(conf);
 			Initdata = conf.Initdata;
 			BeginTime = DateTime.Now;
 			if (ActiveMatch != null)
@@ -218,7 +218,7 @@ namespace BotzoneLocalRunner
 
 		public override void ReplayMatch(IWebBrowser Browser)
 		{
-			Browser.Load(Properties.Settings.Default.BotzoneMatchURLBase + MatchID);
+			Browser.Load(BotzoneProtocol.Credentials.BotzoneMatchURL(MatchID, false));
 		}
 
 		public override async Task AbortMatch()

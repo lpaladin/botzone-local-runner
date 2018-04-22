@@ -88,7 +88,7 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 www.botzone.org/api/([0-9a-f]+)/([^/]+)/localai 的本地化字符串。
+        ///   查找类似 ([^\.]*\.botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+) 的本地化字符串。
         /// </summary>
         public static string BOTZONE_LOCALAI_URL_REGEX {
             get {
@@ -195,9 +195,8 @@ namespace BotzoneLocalRunner {
         ///		如果有该选项，则将该场对局保存到现有对局组或新建的对局组。
         ///	-l &lt;log路径，形如xxx.json&gt;
         ///		如果有该选项，则将该场对局的完整 log 以单行 json 格式保存到文本文件。
-        ///
-        ///程序输出格式：
-        ///	第一行： &lt;json 格式的对局的完整 log&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///	--simple-io
+        ///		如果有该选项，则对本地程序使用简单IO。 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         public static string CONSOLE_HELP {
             get {

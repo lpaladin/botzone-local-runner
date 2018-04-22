@@ -23,6 +23,8 @@ namespace BotzoneLocalRunner
 		internal string UserID { get; set; }
 		internal string Secret { get; set; }
 
+		internal string BotzoneDomain { get; set; } = "https://www.botzone.org";
+
 		private string _BotzoneCopiedURL = "<在此粘贴Botzone本地AI的URL>";
 		public string BotzoneCopiedURL
 		{
@@ -44,8 +46,9 @@ namespace BotzoneLocalRunner
 					}
 					else
 					{
-						UserID = m[0].Groups[1].Value;
-						Secret = m[0].Groups[2].Value;
+						BotzoneDomain = m[0].Groups[1].Value;
+						UserID = m[0].Groups[3].Value;
+						Secret = m[0].Groups[4].Value;
 						IsValid = true;
 						Properties.Settings.Default.LastBotzoneLocalAIURL = value;
 						ValidationChanged?.Invoke(this, null);
@@ -56,9 +59,18 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		internal string BotzoneLocalAIURL() => $"{UserID}/{Secret}/localai";
-		internal string BotzoneRunMatchURL() => $"{UserID}/{Secret}/runmatch";
-		internal string BotzoneAbortMatchURL() => $"{UserID}/{Secret}/abortmatch";
+		internal string BotzoneLocalAIURL() =>
+			$"{BotzoneDomain}/api/{UserID}/{Secret}/localai";
+		internal string BotzoneRunMatchURL() =>
+			$"{BotzoneDomain}/api/{UserID}/{Secret}/runmatch";
+		internal string BotzoneAbortMatchURL() =>
+			$"{BotzoneDomain}/api/{UserID}/{Secret}/abortmatch";
+		internal string BotzoneGamesURL() =>
+			$"{BotzoneDomain}/api/public/games";
+		internal string BotzoneMatchURL(string matchid, bool lite) =>
+			$"{BotzoneDomain}/match/{matchid}" + (lite ? "?lite=true" : "");
+		internal string BotzoneLocalMatchURL(string gamename) =>
+			$"{BotzoneDomain}/localmatch/{gamename}";
 
 		private bool _IsValid = false;
 		public bool IsValid
@@ -182,10 +194,7 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		static HttpClient client = new HttpClient
-		{
-			BaseAddress = new Uri(Properties.Settings.Default.BotzoneAPIBase)
-		};
+		static HttpClient client = new HttpClient();
 		internal static MatchLogConverter logConverter = new MatchLogConverter();
 
 		/// <summary>
@@ -347,9 +356,7 @@ namespace BotzoneLocalRunner
 				Logger.Log(LogLevel.Info, "尝试从 Botzone 读取对局 Log……");
 				try
 				{
-					var str = await client.GetStringAsync(
-						Properties.Settings.Default.BotzoneMatchURLBase + match.MatchID + "?lite=true"
-					);
+					var str = await client.GetStringAsync(Credentials.BotzoneMatchURL(match.MatchID, true));
 					match.Logs = JsonConvert.DeserializeObject<List<ILogItem>>(str, logConverter);
 					match.DisplayLogs = (from item in match.Logs.OfType<JudgeLogItem>()
 										select item.output.display).ToList();
@@ -373,7 +380,7 @@ namespace BotzoneLocalRunner
 				Logger.Log(LogLevel.Info, "尝试从 Botzone 读取游戏列表……");
 				try
 				{
-					var str = await client.GetStringAsync(Properties.Settings.Default.BotzoneGamesPath);
+					var str = await client.GetStringAsync(Credentials.BotzoneGamesURL());
 					raw = JArray.Parse(str);
 				}
 				catch (Exception ex)
