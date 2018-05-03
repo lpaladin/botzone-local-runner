@@ -131,6 +131,14 @@ namespace BotzoneLocalRunner
 			Logger.Log(LogLevel.Info, "正在从 Botzone 载入 Judge 程序...");
 			Status = MatchStatus.Waiting;
 			BrowserJSObject.Instance.JudgeTask = new TaskCompletionSource<string>();
+			// 将人类玩家的位置插入网页中
+			BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
+				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
+				$@"
+<script>
+	playerSlotID = {Configuration.First(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
+</script>
+");
 			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
 
 			for (int i = 0; i < Configuration.Count; i++)
@@ -152,6 +160,13 @@ namespace BotzoneLocalRunner
 
 				// Judge 请求处理
 				var judgeItem = new JudgeLogItem();
+				Debug.Print($@"emulated_gio.sendToJudge({
+					JsonConvert.SerializeObject(new
+					{
+						log = Logs,
+						initdata = Initdata
+					})
+				});");
 				SendToJudge();
 				Logs.Add(judgeItem);
 				try
@@ -160,7 +175,8 @@ namespace BotzoneLocalRunner
 					var output = JsonConvert.DeserializeObject<JudgeOutput>(judgeRaw);
 					judgeItem.output = output;
 					judgeItem.verdict = "OK";
-					if (Logs.Count == 0 && output.initdata?.Length > 0)
+					if (Logs.Count == 1 && output.initdata != null &&
+						!(output.initdata is string && output.initdata.Length == 0))
 						Initdata = output.initdata;
 					AddFullLogItem(judgeItem);
 				}
@@ -169,6 +185,7 @@ namespace BotzoneLocalRunner
 					judgeItem.response = ex.Message;
 					judgeItem.verdict = "RE";
 					AddFullLogItem(judgeItem);
+					Logger.Log(LogLevel.No, "Judge 崩溃或载入失败，游戏中止");
 					await OnFinish(true);
 					return;
 				}
@@ -226,8 +243,9 @@ namespace BotzoneLocalRunner
 						else
 						{
 							runner.Requests.Add(pair.Value);
-							conf.LogContent += JsonConvert.SerializeObject(pair.Value) + Environment.NewLine;
-							Logger.Log(LogLevel.InfoTip, $"Judge 向{id}号玩家（本地AI）发起请求：{pair.Value}");
+							var val = JsonConvert.SerializeObject(pair.Value);
+							conf.LogContent += val + Environment.NewLine;
+							Logger.Log(LogLevel.InfoTip, $"Judge 向{id}号玩家（本地AI）发起请求：{val}");
 						}
 						ProgramLogItem resp = null;
 						try
@@ -289,6 +307,7 @@ namespace BotzoneLocalRunner
 					{
 						resp.response = raw;
 					}
+					resp.verdict = "OK";
 					botItem.Add(humanID.ToString(), resp);
 					Logger.Log(LogLevel.OK, $"{humanID}号玩家（人类）给出了反馈");
 				}
@@ -304,7 +323,7 @@ namespace BotzoneLocalRunner
 				$@"
 <script>
 	live = false;
-	initdata = {JsonConvert.ToString(Initdata)};
+	initdata = {JsonConvert.SerializeObject(Initdata)};
 	loglist = {JsonConvert.SerializeObject(Logs)};
 </script>
 ");

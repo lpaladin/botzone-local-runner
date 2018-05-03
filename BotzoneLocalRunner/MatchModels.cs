@@ -21,7 +21,7 @@ namespace BotzoneLocalRunner
 		public string command;
 		public dynamic display;
 		public Dictionary<string, dynamic> content;
-		public string initdata;
+		public dynamic initdata;
 	}
 
 	[Serializable]
@@ -110,7 +110,7 @@ namespace BotzoneLocalRunner
 		public MatchConfiguration Configuration { get; set; }
 		public DateTime BeginTime { get; set; }
 		public DateTime EndTime { get; set; }
-		public string Initdata { get; set; } = "";
+		public dynamic Initdata { get; set; } = "";
 		public double[] Scores { get; set; }
 		public MatchStatus Status { get; set; } = MatchStatus.Waiting;
 

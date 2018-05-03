@@ -147,11 +147,11 @@ namespace BotzoneLocalRunner
 					break;
 				case ".py":
 					processInfo.FileName = "python";
-					processInfo.Arguments = ProgramPath;
+					processInfo.Arguments = $"\"{ProgramPath}\"";
 					break;
 				case ".js":
 					processInfo.FileName = "node";
-					processInfo.Arguments = ProgramPath;
+					processInfo.Arguments = $"\"{ProgramPath}\"";
 					break;
 				case ".class":
 					processInfo.FileName = "java";

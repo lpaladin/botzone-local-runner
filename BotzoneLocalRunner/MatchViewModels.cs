@@ -246,7 +246,7 @@ namespace BotzoneLocalRunner
 			}
 		}
 
-		public string Initdata { get; set; } = "";
+		public dynamic Initdata { get; set; } = "";
 
 		public event EventHandler ValidationChanged;
 

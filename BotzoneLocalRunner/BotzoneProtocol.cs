@@ -313,7 +313,7 @@ namespace BotzoneLocalRunner
 				Logger.Log(LogLevel.Info, "尝试向 Botzone 发起对局请求……");
 				var req = new HttpRequestMessage(HttpMethod.Get, Credentials.BotzoneRunMatchURL());
 				req.Headers.Add("X-Game", conf.Game.Name);
-				req.Headers.Add("X-Initdata", conf.Initdata);
+				req.Headers.Add("X-Initdata", conf.Initdata is string ? conf.Initdata : JsonConvert.SerializeObject(conf.Initdata));
 				req.Headers.Add("X-UseSimpleIO", LocalProgramRunner.IsSimpleIO ? "true" : "false");
 				req.Headers.Add("X-Timelimit", Properties.Settings.Default.TimeLimit.TotalSeconds.ToString());
 				for (int i = 0; i < conf.Count; i++)
