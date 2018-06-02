@@ -131,25 +131,15 @@ namespace BotzoneLocalRunner
 			Logger.Log(LogLevel.Info, "正在从 Botzone 载入 Judge 程序...");
 			Status = MatchStatus.Waiting;
 			BrowserJSObject.Instance.JudgeTask = new TaskCompletionSource<string>();
+
 			// 将人类玩家的位置插入网页中
-			{
-				int human;
-				try
-				{
-					human = Configuration.First(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1;
-				}
-				catch
-				{
-					human = -1;
-				}
-				BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
-					"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
-					$@"
+			BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
+				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
+				$@"
 <script>
-	playerSlotID = {human};
+	playerSlotID = {Configuration.SingleOrDefault(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
 </script>
 ");
-			}
 			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
 
 			for (int i = 0; i < Configuration.Count; i++)
@@ -209,7 +199,7 @@ namespace BotzoneLocalRunner
 					// 判定游戏结束
 					foreach (var pair in judgeItem.output.content)
 						Scores[int.Parse(pair.Key)] = 
-							pair.Value is string ? double.Parse(pair.Value) : pair.Value;
+							pair.Value is string ? double.Parse(pair.Value) : (pair.Value ?? 0);
 					Logger.Log(LogLevel.OK, $"Judge 判定游戏结束，比分：{String.Join(", ", Scores)}");
 					await OnFinish(false);
 					return;
