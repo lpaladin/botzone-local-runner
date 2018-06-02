@@ -132,13 +132,24 @@ namespace BotzoneLocalRunner
 			Status = MatchStatus.Waiting;
 			BrowserJSObject.Instance.JudgeTask = new TaskCompletionSource<string>();
 			// 将人类玩家的位置插入网页中
-			BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
-				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
-				$@"
+			{
+				int human;
+				try
+				{
+					human = Configuration.First(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1;
+				}
+				catch
+				{
+					human = -1;
+				}
+				BotzoneCefRequestHandler.MatchInjectFilter = new CefSharp.Filters.FindReplaceResponseFilter(
+					"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
+					$@"
 <script>
-	playerSlotID = {Configuration.First(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
+	playerSlotID = {human};
 </script>
 ");
+			}
 			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
 
 			for (int i = 0; i < Configuration.Count; i++)
