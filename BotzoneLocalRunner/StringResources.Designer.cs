@@ -88,7 +88,7 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 ([^\.]*\.botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+) 的本地化字符串。
+        ///   查找类似 ([^\.]*botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+) 的本地化字符串。
         /// </summary>
         public static string BOTZONE_LOCALAI_URL_REGEX {
             get {

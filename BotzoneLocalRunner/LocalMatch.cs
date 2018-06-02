@@ -137,7 +137,7 @@ namespace BotzoneLocalRunner
 				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
 				$@"
 <script>
-	playerSlotID = {Configuration.SingleOrDefault(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
+	playerSlotID = {Configuration.FirstOrDefault(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
 </script>
 ");
 			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
