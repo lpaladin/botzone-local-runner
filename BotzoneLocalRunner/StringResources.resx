@@ -127,7 +127,7 @@
     <value>&lt;在此粘贴Botzone本地AI的URL（点击Botzone头像菜单查看）&gt;</value>
   </data>
   <data name="BOTZONE_LOCALAI_URL_REGEX" xml:space="preserve">
-    <value>([^\.]*botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+)</value>
+    <value>(https?://.*botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+)</value>
   </data>
   <data name="BOTZONE_MATCH" xml:space="preserve">
     <value>这是一场 Botzone 评测的对局</value>

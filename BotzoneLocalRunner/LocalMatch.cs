@@ -49,7 +49,7 @@ namespace BotzoneLocalRunner
 		#region 调用JS方法
 		internal void SendToJudge() =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
-				$@"emulated_gio.sendToJudge({
+				$@"Botzone.emulated_gio.sendToJudge({
 					JsonConvert.SerializeObject(new
 					{
 						log = Logs,
@@ -58,23 +58,23 @@ namespace BotzoneLocalRunner
 				});");
 		internal void EmitEvent(string eventName, string data) =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
-				$"emulated_gio.emit('{eventName}', {JsonConvert.ToString(data)});"
+				$"Botzone.emulated_gio.emit('{eventName}', {JsonConvert.ToString(data)});"
 			);
 		internal void EmitEvent(string eventName, object data) =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
-				$"emulated_gio.emit('{eventName}', {JsonConvert.SerializeObject(data)});"
+				$"Botzone.emulated_gio.emit('{eventName}', {JsonConvert.SerializeObject(data)});"
 			);
 		internal void EmitEvent(string eventName) =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
-				$"emulated_gio.emit('{eventName}');"
+				$"Botzone.emulated_gio.emit('{eventName}');"
 			);
 		internal void AddFullLogItem(ILogItem item) =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
-				$"emulated_gio.loglist.push({JsonConvert.SerializeObject(item)});"
+				$"Botzone.emulated_gio.loglist.push({JsonConvert.SerializeObject(item)});"
 			);
 		internal void SetStatus(string status) =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
-				$"emulated_gio.status = '{status}';"
+				$"Botzone.emulated_gio.status = '{status}';"
 			);
 		internal void SetIsSimpleIO(int playerID, bool to) =>
 			Browser.GetMainFrame().ExecuteJavaScriptAsync(
@@ -161,7 +161,7 @@ namespace BotzoneLocalRunner
 
 				// Judge 请求处理
 				var judgeItem = new JudgeLogItem();
-				Debug.Print($@"emulated_gio.sendToJudge({
+				Debug.Print($@"Botzone.emulated_gio.sendToJudge({
 					JsonConvert.SerializeObject(new
 					{
 						log = Logs,

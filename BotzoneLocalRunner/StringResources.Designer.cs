@@ -88,7 +88,7 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   查找类似 ([^\.]*botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+) 的本地化字符串。
+        ///   查找类似 (https?://.*botzone\.(org|org\.cn))/api/([0-9a-f]+)/([^/]+) 的本地化字符串。
         /// </summary>
         public static string BOTZONE_LOCALAI_URL_REGEX {
             get {
@@ -189,14 +189,14 @@ namespace BotzoneLocalRunner {
         ///		如果玩家i是本地AI，那么写玩家i的本地程序文件路径；如果玩家i是Botzone上的AI，那么写玩家i在Botzone上的BotID。
         ///	-h
         ///		显示此帮助
-        ///	-u &lt;本地AI的URL，形如https://www.botzone.org/api/xxx/xxx/localai&gt;
+        ///	-u &lt;本地AI的URL，形如https://www.botzone.org.cn/api/xxx/xxx/localai&gt;
         ///		有Botzone的AI参与时必填。点击Botzone上的头像菜单可以查看本地AI配置，其中就有本地AI的URL，复制过来即可。
         ///	-o &lt;对局组路径，形如xxx.matches&gt;
         ///		如果有该选项，则将该场对局保存到现有对局组或新建的对局组。
         ///	-l &lt;log路径，形如xxx.json&gt;
         ///		如果有该选项，则将该场对局的完整 log 以单行 json 格式保存到文本文件。
         ///	--simple-io
-        ///		如果有该选项，则对本地程序使用简单IO。 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		如果有该选项，则对本地程序使用简单 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         public static string CONSOLE_HELP {
             get {

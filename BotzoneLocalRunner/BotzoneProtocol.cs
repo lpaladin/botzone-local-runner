@@ -23,7 +23,7 @@ namespace BotzoneLocalRunner
 		internal string UserID { get; set; }
 		internal string Secret { get; set; }
 
-		internal string BotzoneDomain { get; set; } = "https://www.botzone.org";
+		internal string BotzoneDomain { get; set; } = "https://www.botzone.org.cn";
 
 		private string _BotzoneCopiedURL = "<在此粘贴Botzone本地AI的URL>";
 		public string BotzoneCopiedURL
