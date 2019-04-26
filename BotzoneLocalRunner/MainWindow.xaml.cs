@@ -324,7 +324,14 @@ namespace BotzoneLocalRunner
 
 		private async void btnAbortMatch_Click(object sender, RoutedEventArgs e)
 		{
-			await AbortMatch();
+			try
+			{
+				await AbortMatch();
+			}
+			catch (Exception ex)
+			{
+				Logger.Log(LogLevel.No, StringResources.ABORT_FAILED + ex.Message);
+			}
 		}
 	}
 }

@@ -122,8 +122,12 @@ namespace BotzoneLocalRunner
 		private string SerializedDisplayLogs;
 		private string SerializedLogs;
 
+		[NonSerialized]
+		protected readonly MatchConfiguration OriginalConfiguration; // 用于展示下方 Tab 里的 Log
+
 		protected Match(MatchConfiguration conf)
 		{
+			OriginalConfiguration = conf;
 			Configuration = ObjectCopier.Clone(conf);
 			Initdata = conf.Initdata;
 			BeginTime = DateTime.Now;
@@ -184,7 +188,7 @@ namespace BotzoneLocalRunner
 			for (int i = 0; i < conf.Count; i++)
 				if (conf[i].Type != PlayerType.BotzoneBot)
 					MySlot = i;
-			MyConf = Configuration[MySlot];
+			MyConf = conf[MySlot]; // 用于展示下方 Tab 里的 Log
 			Runner = new LocalProgramRunner
 			{
 				ProgramPath = conf[MySlot].ID

@@ -226,4 +226,7 @@
   <data name="TITLE" xml:space="preserve">
     <value>Botzone 本地调试工具</value>
   </data>
+  <data name="ABORT_FAILED" xml:space="preserve">
+    <value>中止对局时发生错误：</value>
+  </data>
 </root>

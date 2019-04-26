@@ -110,7 +110,7 @@ namespace BotzoneLocalRunner
 				}
 				else
 				{
-					dynamic resp = JsonConvert.DeserializeObject(p.StandardOutput.ReadLine());
+					dynamic resp = JsonConvert.DeserializeObject(p.StandardOutput.ReadToEnd());
 					Data = resp.data;
 					GlobalData = resp.globaldata;
 					Responses.Add(resp.response);

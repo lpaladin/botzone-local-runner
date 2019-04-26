@@ -137,20 +137,20 @@ namespace BotzoneLocalRunner
 				"<!-- INJECT_FINISHED_MATCH_LOGS_HERE -->",
 				$@"
 <script>
-	playerSlotID = {Configuration.FirstOrDefault(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
+	playerSlotID = {OriginalConfiguration.FirstOrDefault(conf => conf.Type == PlayerType.LocalHuman)?.SlotID ?? -1};
 </script>
 ");
-			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(Configuration.Game.Name));
+			Browser.Load(BotzoneProtocol.Credentials.BotzoneLocalMatchURL(OriginalConfiguration.Game.Name));
 
-			for (int i = 0; i < Configuration.Count; i++)
-				SetIsSimpleIO(i, Configuration[i].Type == PlayerType.LocalAI);
+			for (int i = 0; i < OriginalConfiguration.Count; i++)
+				SetIsSimpleIO(i, OriginalConfiguration[i].Type == PlayerType.LocalAI);
 
 			await BrowserJSObject.Instance.JudgeTask.Task;
 
 			SetStatus("waiting");
 			Status = MatchStatus.Running;
 			Logger.Log(LogLevel.OK, "Judge 程序加载成功，开始本地对局");
-			foreach (var conf in Configuration)
+			foreach (var conf in OriginalConfiguration)
 				conf.LogContent = "";
 
 			// 开始对局！
@@ -210,7 +210,7 @@ namespace BotzoneLocalRunner
 				foreach (var pair in judgeItem.output.content)
 				{
 					int id = int.Parse(pair.Key);
-					if (Configuration[id].Type == PlayerType.LocalHuman)
+					if (OriginalConfiguration[id].Type == PlayerType.LocalHuman)
 					{
 						humanID = id;
 						Logger.Log(LogLevel.InfoTip, $"Judge 向{id}号玩家（人类）发起请求");
@@ -227,7 +227,7 @@ namespace BotzoneLocalRunner
 				foreach (var pair in judgeItem.output.content)
 				{
 					int id = int.Parse(pair.Key);
-					var conf = Configuration[id];
+					var conf = OriginalConfiguration[id];
 					if (conf.Type != PlayerType.LocalHuman)
 					{
 						// 本地 AI
@@ -260,7 +260,7 @@ namespace BotzoneLocalRunner
 								Debug.Assert(req.Success);
 								resp.response = req.Result;
 							}
-							Logger.Log(LogLevel.OK, $"{id}号玩家（本地AI）给出了反馈：{resp.raw}");
+							Logger.Log(LogLevel.OK, $"{id}号玩家（本地AI）给出了反馈：{resp.raw ?? JsonConvert.SerializeObject(resp.response)}");
 						}
 						catch (TimeoutException)
 						{

@@ -61,6 +61,15 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
+        ///   查找类似 中止对局时发生错误： 的本地化字符串。
+        /// </summary>
+        public static string ABORT_FAILED {
+            get {
+                return ResourceManager.GetString("ABORT_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Botzone本地AI的URL无效 的本地化字符串。
         /// </summary>
         public static string BAD_LOCALAI_URL {
