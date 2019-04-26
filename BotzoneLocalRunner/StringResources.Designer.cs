@@ -47,7 +47,7 @@ namespace BotzoneLocalRunner {
         }
         
         /// <summary>
-        ///   使用此强类型资源类，为所有资源查找
+        ///   重写当前线程的 CurrentUICulture 属性
         ///   重写当前线程的 CurrentUICulture 属性。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -273,6 +273,15 @@ namespace BotzoneLocalRunner {
         public static string ID_EMPTY {
             get {
                 return ResourceManager.GetString("ID_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 本地AI程序输出不是合法的JSON： 的本地化字符串。
+        /// </summary>
+        public static string INVALID_JSON {
+            get {
+                return ResourceManager.GetString("INVALID_JSON", resourceCulture);
             }
         }
         

@@ -229,4 +229,7 @@
   <data name="ABORT_FAILED" xml:space="preserve">
     <value>中止对局时发生错误：</value>
   </data>
+  <data name="INVALID_JSON" xml:space="preserve">
+    <value>本地AI程序输出不是合法的JSON：</value>
+  </data>
 </root>

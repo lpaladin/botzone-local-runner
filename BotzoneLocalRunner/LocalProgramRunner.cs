@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace BotzoneLocalRunner
 {
@@ -110,18 +109,27 @@ namespace BotzoneLocalRunner
 				}
 				else
 				{
-					dynamic resp = JsonConvert.DeserializeObject(p.StandardOutput.ReadToEnd());
-					Data = resp.data;
-					GlobalData = resp.globaldata;
-					Responses.Add(resp.response);
-					return new ProgramLogItem
+					var raw = p.StandardOutput.ReadToEnd();
+
+					try
 					{
-						time = (int)p.TotalProcessorTime.TotalMilliseconds,
-						// memory = (int)(p.PeakWorkingSet64 / 1024 / 1024),
-						response = resp.response,
-						debug = resp.debug,
-						verdict = "OK"
-					};
+						dynamic resp = JsonConvert.DeserializeObject(raw);
+						Data = resp.data;
+						GlobalData = resp.globaldata;
+						Responses.Add(resp.response);
+						return new ProgramLogItem
+						{
+							time = (int)p.TotalProcessorTime.TotalMilliseconds,
+							// memory = (int)(p.PeakWorkingSet64 / 1024 / 1024),
+							response = resp.response,
+							debug = resp.debug,
+							verdict = "OK"
+						};
+					}
+					catch
+					{
+						throw new Exception(StringResources.INVALID_JSON + raw);
+					}
 				}
 			}
 			finally
